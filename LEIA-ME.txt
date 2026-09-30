@@ -1,0 +1,22 @@
+PROJETO DIARIOS OFICIAIS
+========================
+
+PARA USAR
+  Dois cliques em  ABRIR_PAINEL.bat
+  O navegador abre em http://localhost:8080
+  Para parar, feche a janela preta.
+
+  (Extraia o zip INTEIRO antes. Nao precisa instalar nada.)
+
+O QUE TEM AQUI
+  ABRIR_PAINEL.bat   abre o programa
+  codigo\            o codigo-fonte para ler, mais os guias de estudo (.md)
+  dados\             os diarios coletados
+  _sistema\          Java e programa compilado. NAO MEXER.
+                     (dentro: RODAR_TESTES.bat, para ver os 85 testes)
+
+SE O WINDOWS AVISAR "protegeu o computador":
+  Mais informacoes -> Executar assim mesmo.
+
+Nesta versao nao da para editar e recompilar (o Java portatil nao tem o
+compilador). Para editar, use o IntelliJ abrindo codigo\pom.xml em outro PC.

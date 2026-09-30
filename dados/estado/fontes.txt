@@ -1,0 +1,27 @@
+1200401;Rio Branco;AC;false;NUNCA_TENTADA;-;;false;;
+2704302;Maceió;AL;false;NUNCA_TENTADA;-;;false;;
+1600303;Macapá;AP;false;NUNCA_TENTADA;-;;false;;
+1302603;Manaus;AM;false;NUNCA_TENTADA;-;;false;;
+2927408;Salvador;BA;false;NUNCA_TENTADA;-;;false;;
+2304400;Fortaleza;CE;true;FALHOU;2026-09-30 18:53:44;consulta respondeu HTTP 503 [no available server] (depois de 4 tentativas);false;;
+5300108;Brasília;DF;false;NUNCA_TENTADA;-;;false;;
+3205309;Vitória;ES;false;NUNCA_TENTADA;-;;false;;
+5208707;Goiânia;GO;false;NUNCA_TENTADA;-;;false;;
+2111300;São Luís;MA;false;NUNCA_TENTADA;-;;false;;
+5103403;Cuiabá;MT;false;NUNCA_TENTADA;-;;false;;
+5002704;Campo Grande;MS;false;NUNCA_TENTADA;-;;false;;
+3106200;Belo Horizonte;MG;true;SEM_EDICAO;2026-09-30 18:55:49;;false;2026-09-29;2026-09-30
+1501402;Belém;PA;false;NUNCA_TENTADA;-;;false;;
+2507507;João Pessoa;PB;false;NUNCA_TENTADA;-;;false;;
+4106902;Curitiba;PR;true;FALHOU;2026-09-30 18:57:24;consulta respondeu HTTP 503 [no available server] (depois de 4 tentativas);false;;
+2611606;Recife;PE;true;COM_DADO;2026-09-30 18:58:13;;false;2026-09-29;2026-09-30
+2211001;Teresina;PI;false;NUNCA_TENTADA;-;;false;;
+3304557;Rio de Janeiro;RJ;false;NUNCA_TENTADA;-;;false;;
+2408102;Natal;RN;false;NUNCA_TENTADA;-;;false;;
+4314902;Porto Alegre;RS;false;NUNCA_TENTADA;-;;false;;
+1100205;Porto Velho;RO;false;NUNCA_TENTADA;-;;false;;
+1400100;Boa Vista;RR;false;NUNCA_TENTADA;-;;false;;
+4205407;Florianópolis;SC;false;NUNCA_TENTADA;-;;false;;
+3550308;São Paulo;SP;false;NUNCA_TENTADA;-;;false;;
+2800308;Aracaju;SE;true;FALHOU;2026-09-30 18:59:18;consulta respondeu HTTP 503 [no available server] (depois de 4 tentativas);false;;
+1721000;Palmas;TO;false;NUNCA_TENTADA;-;;false;;
