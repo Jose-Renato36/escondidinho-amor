@@ -1,5 +1,6 @@
 CODIGO-FONTE COMPLETO - PROJETO DIARIOS OFICIAIS
 Cada arquivo comeca com a linha "ARQUIVO: caminho". Numeros de linha a esquerda.
+U+00A0 (espaco nao separavel) aparece escrito como \u00a0.
 
 ====================================================================================================
 ARQUIVO: pom.xml
@@ -50,7 +51,49 @@ DESCRICAO: Configuração do Maven: Java 17, nenhuma dependência, classe princi
  43  </project>
 
 ====================================================================================================
-ARQUIVO: src/main/java/diarios/modelo/Fato.java
+ARQUIVO: ABRIR_PAINEL.bat
+DESCRICAO: Script do Windows que abre o painel com o Java portátil (_sistema/java) e o diarios.jar.
+====================================================================================================
+  1  @echo off
+  2  chcp 65001 >nul
+  3  cd /d "%~dp0"
+  4  if not exist "_sistema\java\bin\java.exe" (
+  5    echo Extraia o zip INTEIRO antes de abrir.
+  6    pause
+  7    exit /b 1
+  8  )
+  9  "_sistema\java\bin\java.exe" -Dfile.encoding=UTF-8 -Dstdout.encoding=UTF-8 -jar "_sistema\diarios.jar" %*
+ 10  pause
+
+====================================================================================================
+ARQUIVO: LEIA-ME.txt
+DESCRICAO: Instruções curtas de uso para quem recebe o zip (abrir o painel, o que tem em cada pasta).
+====================================================================================================
+  1  PROJETO DIARIOS OFICIAIS
+  2  ========================
+  3  
+  4  PARA USAR
+  5    Dois cliques em  ABRIR_PAINEL.bat
+  6    O navegador abre em http://localhost:8080
+  7    Para parar, feche a janela preta.
+  8  
+  9    (Extraia o zip INTEIRO antes. Nao precisa instalar nada.)
+ 10  
+ 11  O QUE TEM AQUI
+ 12    ABRIR_PAINEL.bat   abre o programa
+ 13    codigo\            o codigo-fonte para ler, mais os guias de estudo (.md)
+ 14    dados\             os diarios coletados
+ 15    _sistema\          Java e programa compilado. NAO MEXER.
+ 16                       (dentro: RODAR_TESTES.bat, para ver os 85 testes)
+ 17  
+ 18  SE O WINDOWS AVISAR "protegeu o computador":
+ 19    Mais informacoes -> Executar assim mesmo.
+ 20  
+ 21  Nesta versao nao da para editar e recompilar (o Java portatil nao tem o
+ 22  compilador). Para editar, use o IntelliJ abrindo codigo\pom.xml em outro PC.
+
+====================================================================================================
+ARQUIVO: diarios/modelo/Fato.java
 DESCRICAO: Um dado achado no texto (CNPJ, data, valor...) + a POSIÇÃO exata onde foi achado.
 ====================================================================================================
   1  package diarios.modelo;
@@ -110,7 +153,7 @@ DESCRICAO: Um dado achado no texto (CNPJ, data, valor...) + a POSIÇÃO exata on
  55  }
 
 ====================================================================================================
-ARQUIVO: src/main/java/diarios/modelo/Ato.java
+ARQUIVO: diarios/modelo/Ato.java
 DESCRICAO: Unidade de trabalho: um decreto/portaria/extrato do diário, com seus fatos e a decisão do portão.
 ====================================================================================================
   1  package diarios.modelo;
@@ -214,7 +257,7 @@ DESCRICAO: Unidade de trabalho: um decreto/portaria/extrato do diário, com seus
  99  }
 
 ====================================================================================================
-ARQUIVO: src/main/java/diarios/modelo/Diario.java
+ARQUIVO: diarios/modelo/Diario.java
 DESCRICAO: O arquivo de um dia inteiro: texto bruto e texto limpo lado a lado, mais os atos.
 ====================================================================================================
   1  package diarios.modelo;
@@ -299,7 +342,7 @@ DESCRICAO: O arquivo de um dia inteiro: texto bruto e texto limpo lado a lado, m
  80  }
 
 ====================================================================================================
-ARQUIVO: src/main/java/diarios/modelo/Contrato.java
+ARQUIVO: diarios/modelo/Contrato.java
 DESCRICAO: Uma contratação (quem, quanto, processo) e o formatador de reais.
 ====================================================================================================
   1  package diarios.modelo;
@@ -363,7 +406,7 @@ DESCRICAO: Uma contratação (quem, quanto, processo) e o formatador de reais.
  59  }
 
 ====================================================================================================
-ARQUIVO: src/main/java/diarios/modelo/Relacao.java
+ARQUIVO: diarios/modelo/Relacao.java
 DESCRICAO: Aresta do grafo: ato --(ALTERA | REVOGA | PRORROGA | CITA)--> norma.
 ====================================================================================================
   1  package diarios.modelo;
@@ -416,7 +459,7 @@ DESCRICAO: Aresta do grafo: ato --(ALTERA | REVOGA | PRORROGA | CITA)--> norma.
  48  }
 
 ====================================================================================================
-ARQUIVO: src/main/java/diarios/modelo/Achado.java
+ARQUIVO: diarios/modelo/Achado.java
 DESCRICAO: Uma frase da interpretação, com nível, título e evidência.
 ====================================================================================================
   1  package diarios.modelo;
@@ -452,7 +495,7 @@ DESCRICAO: Uma frase da interpretação, com nível, título e evidência.
  31  }
 
 ====================================================================================================
-ARQUIVO: src/main/java/diarios/erros/DiarioIlegivelException.java
+ARQUIVO: diarios/erros/DiarioIlegivelException.java
 DESCRICAO: Exceção própria: diário sem texto aproveitável (carrega motivo e evidência).
 ====================================================================================================
   1  package diarios.erros;
@@ -473,7 +516,7 @@ DESCRICAO: Exceção própria: diário sem texto aproveitável (carrega motivo e
  16  }
 
 ====================================================================================================
-ARQUIVO: src/main/java/diarios/erros/ColetaException.java
+ARQUIVO: diarios/erros/ColetaException.java
 DESCRICAO: Exceção própria: falha ao falar com a API (diz se vale tentar de novo).
 ====================================================================================================
   1  package diarios.erros;
@@ -501,7 +544,7 @@ DESCRICAO: Exceção própria: falha ao falar com a API (diz se vale tentar de n
  23  }
 
 ====================================================================================================
-ARQUIVO: src/main/java/diarios/extratores/Extrator.java
+ARQUIVO: diarios/extratores/Extrator.java
 DESCRICAO: Classe ABSTRATA: contrato "extrair" + utilitários (casaMolde, semAcento...).
 ====================================================================================================
   1  package diarios.extratores;
@@ -562,7 +605,7 @@ DESCRICAO: Classe ABSTRATA: contrato "extrair" + utilitários (casaMolde, semAce
  56  }
 
 ====================================================================================================
-ARQUIVO: src/main/java/diarios/extratores/ExtratorCnpj.java
+ARQUIVO: diarios/extratores/ExtratorCnpj.java
 DESCRICAO: Filha: acha CNPJ pelo molde 99.999.999/9999-99.
 ====================================================================================================
   1  package diarios.extratores;
@@ -592,7 +635,7 @@ DESCRICAO: Filha: acha CNPJ pelo molde 99.999.999/9999-99.
  25  }
 
 ====================================================================================================
-ARQUIVO: src/main/java/diarios/extratores/ExtratorData.java
+ARQUIVO: diarios/extratores/ExtratorData.java
 DESCRICAO: Filha: acha datas numéricas (dd/mm/aaaa) e por extenso ("24 de março de 2026").
 ====================================================================================================
   1  package diarios.extratores;
@@ -679,7 +722,7 @@ DESCRICAO: Filha: acha datas numéricas (dd/mm/aaaa) e por extenso ("24 de març
  82  }
 
 ====================================================================================================
-ARQUIVO: src/main/java/diarios/extratores/ExtratorValor.java
+ARQUIVO: diarios/extratores/ExtratorValor.java
 DESCRICAO: Filha: acha valores em reais ("R$ 1.234,56") e converte para número.
 ====================================================================================================
   1  package diarios.extratores;
@@ -711,7 +754,7 @@ DESCRICAO: Filha: acha valores em reais ("R$ 1.234,56") e converte para número.
  27  
  28      private int medir(String texto, int inicioRS) {
  29          int p = inicioRS + 2;
- 30          while (p < texto.length() && (texto.charAt(p) == ' ' || texto.charAt(p) == ' ')) {
+ 30          while (p < texto.length() && (texto.charAt(p) == ' ' || texto.charAt(p) == '\u00a0')) {
  31              p++;
  32          }
  33          if (contarDigitos(texto, p) == 0) {
@@ -748,7 +791,7 @@ DESCRICAO: Filha: acha valores em reais ("R$ 1.234,56") e converte para número.
  64  }
 
 ====================================================================================================
-ARQUIVO: src/main/java/diarios/extratores/ExtratorProcesso.java
+ARQUIVO: diarios/extratores/ExtratorProcesso.java
 DESCRICAO: Filha: acha o número do processo depois da palavra "processo".
 ====================================================================================================
   1  package diarios.extratores;
@@ -815,7 +858,7 @@ DESCRICAO: Filha: acha o número do processo depois da palavra "processo".
  62  }
 
 ====================================================================================================
-ARQUIVO: src/main/java/diarios/extratores/ExtratorReferencia.java
+ARQUIVO: diarios/extratores/ExtratorReferencia.java
 DESCRICAO: Filha: acha citações de normas (lei, decreto, portaria...) e as padroniza ("lei:11065").
 ====================================================================================================
   1  package diarios.extratores;
@@ -926,7 +969,7 @@ DESCRICAO: Filha: acha citações de normas (lei, decreto, portaria...) e as pad
 106  }
 
 ====================================================================================================
-ARQUIVO: src/main/java/diarios/etapas/Ingestao.java
+ARQUIVO: diarios/etapas/Ingestao.java
 DESCRICAO: Etapa 1: lista a pasta e cria um Diario por arquivo .txt.
 ====================================================================================================
   1  package diarios.etapas;
@@ -991,7 +1034,7 @@ DESCRICAO: Etapa 1: lista a pasta e cria um Diario por arquivo .txt.
  60  }
 
 ====================================================================================================
-ARQUIVO: src/main/java/diarios/etapas/Limpeza.java
+ARQUIVO: diarios/etapas/Limpeza.java
 DESCRICAO: Etapa 2: remove lixo de PDF e RECUSA o diário sem texto aproveitável.
 ====================================================================================================
   1  package diarios.etapas;
@@ -1057,7 +1100,7 @@ DESCRICAO: Etapa 2: remove lixo de PDF e RECUSA o diário sem texto aproveitáve
  61  }
 
 ====================================================================================================
-ARQUIVO: src/main/java/diarios/etapas/Fragmentacao.java
+ARQUIVO: diarios/etapas/Fragmentacao.java
 DESCRICAO: Etapa 3: corta o diário em atos; só corta com evidência de corpo de texto.
 ====================================================================================================
   1  package diarios.etapas;
@@ -1187,7 +1230,7 @@ DESCRICAO: Etapa 3: corta o diário em atos; só corta com evidência de corpo d
 125  }
 
 ====================================================================================================
-ARQUIVO: src/main/java/diarios/etapas/Extracao.java
+ARQUIVO: diarios/etapas/Extracao.java
 DESCRICAO: Etapa 4: roda todos os extratores em cada ato (polimorfismo).
 ====================================================================================================
   1  package diarios.etapas;
@@ -1229,7 +1272,7 @@ DESCRICAO: Etapa 4: roda todos os extratores em cada ato (polimorfismo).
  37  }
 
 ====================================================================================================
-ARQUIVO: src/main/java/diarios/etapas/Portao.java
+ARQUIVO: diarios/etapas/Portao.java
 DESCRICAO: Etapa 5: dá a nota a cada ato — ACEITO, DUVIDOSO ou REJEITADO — com motivo.
 ====================================================================================================
   1  package diarios.etapas;
@@ -1297,7 +1340,7 @@ DESCRICAO: Etapa 5: dá a nota a cada ato — ACEITO, DUVIDOSO ou REJEITADO — 
  63  }
 
 ====================================================================================================
-ARQUIVO: src/main/java/diarios/etapas/Privacidade.java
+ARQUIVO: diarios/etapas/Privacidade.java
 DESCRICAO: Mascara CPFs (***.***.***-20) sem mudar o tamanho do texto.
 ====================================================================================================
   1  package diarios.etapas;
@@ -1351,7 +1394,7 @@ DESCRICAO: Mascara CPFs (***.***.***-20) sem mudar o tamanho do texto.
  49  }
 
 ====================================================================================================
-ARQUIVO: src/main/java/diarios/etapas/Relatorio.java
+ARQUIVO: diarios/etapas/Relatorio.java
 DESCRICAO: Grava arquivos de saída (BufferedWriter + try-with-resources).
 ====================================================================================================
   1  package diarios.etapas;
@@ -1389,7 +1432,7 @@ DESCRICAO: Grava arquivos de saída (BufferedWriter + try-with-resources).
  33  }
 
 ====================================================================================================
-ARQUIVO: src/main/java/diarios/etapas/Visualizador.java
+ARQUIVO: diarios/etapas/Visualizador.java
 DESCRICAO: Navegador de arquivos do menu de terminal (paginação, busca).
 ====================================================================================================
   1  package diarios.etapas;
@@ -1630,7 +1673,7 @@ DESCRICAO: Navegador de arquivos do menu de terminal (paginação, busca).
 236  }
 
 ====================================================================================================
-ARQUIVO: src/main/java/diarios/etapas/PaginaHtml.java
+ARQUIVO: diarios/etapas/PaginaHtml.java
 DESCRICAO: Monta as seções HTML do painel e o arquivo painel.html (concatenação de String).
 ====================================================================================================
   1  package diarios.etapas;
@@ -2143,7 +2186,7 @@ DESCRICAO: Monta as seções HTML do painel e o arquivo painel.html (concatenaç
 508  }
 
 ====================================================================================================
-ARQUIVO: src/main/java/diarios/analise/Assunto.java
+ARQUIVO: diarios/analise/Assunto.java
 DESCRICAO: Classifica o assunto de um ato (contratação, pessoal, norma...).
 ====================================================================================================
   1  package diarios.analise;
@@ -2219,7 +2262,7 @@ DESCRICAO: Classifica o assunto de um ato (contratação, pessoal, norma...).
  71  }
 
 ====================================================================================================
-ARQUIVO: src/main/java/diarios/analise/PainelContratos.java
+ARQUIVO: diarios/analise/PainelContratos.java
 DESCRICAO: Monta a lista de contratações, separa multas, faz o ranking por CNPJ.
 ====================================================================================================
   1  package diarios.analise;
@@ -2552,7 +2595,7 @@ DESCRICAO: Monta a lista de contratações, separa multas, faz o ranking por CNP
 328  }
 
 ====================================================================================================
-ARQUIVO: src/main/java/diarios/analise/GrafoNormas.java
+ARQUIVO: diarios/analise/GrafoNormas.java
 DESCRICAO: Grafo de normas: decide ALTERA / REVOGA / PRORROGA / CITA; percorre vizinhança.
 ====================================================================================================
   1  package diarios.analise;
@@ -2733,7 +2776,7 @@ DESCRICAO: Grafo de normas: decide ALTERA / REVOGA / PRORROGA / CITA; percorre v
 176  }
 
 ====================================================================================================
-ARQUIVO: src/main/java/diarios/analise/LeituraDoAto.java
+ARQUIVO: diarios/analise/LeituraDoAto.java
 DESCRICAO: Escreve, em português, o que cada ato faz.
 ====================================================================================================
   1  package diarios.analise;
@@ -2894,7 +2937,7 @@ DESCRICAO: Escreve, em português, o que cada ato faz.
 156  }
 
 ====================================================================================================
-ARQUIVO: src/main/java/diarios/analise/Interpretacao.java
+ARQUIVO: diarios/analise/Interpretacao.java
 DESCRICAO: Gera as frases do "o que esses dados dizem" a partir de regras e limites.
 ====================================================================================================
   1  package diarios.analise;
@@ -3312,7 +3355,7 @@ DESCRICAO: Gera as frases do "o que esses dados dizem" a partir de regras e limi
 413  }
 
 ====================================================================================================
-ARQUIVO: src/main/java/diarios/analise/Cobertura.java
+ARQUIVO: diarios/analise/Cobertura.java
 DESCRICAO: Relatório do que foi lido, do que foi recusado e dos totais do portão.
 ====================================================================================================
   1  package diarios.analise;
@@ -3395,7 +3438,7 @@ DESCRICAO: Relatório do que foi lido, do que foi recusado e dos totais do port�
  78  }
 
 ====================================================================================================
-ARQUIVO: src/main/java/diarios/coleta/Coletor.java
+ARQUIVO: diarios/coleta/Coletor.java
 DESCRICAO: Fala com a API do Querido Diário (HttpClient), baixa os textos, tenta de novo.
 ====================================================================================================
   1  package diarios.coleta;
@@ -3616,7 +3659,7 @@ DESCRICAO: Fala com a API do Querido Diário (HttpClient), baixa os textos, tent
 216  }
 
 ====================================================================================================
-ARQUIVO: src/main/java/diarios/coleta/Json.java
+ARQUIVO: diarios/coleta/Json.java
 DESCRICAO: Leitor de JSON feito à mão (indexOf / substring).
 ====================================================================================================
   1  package diarios.coleta;
@@ -3730,7 +3773,7 @@ DESCRICAO: Leitor de JSON feito à mão (indexOf / substring).
 109  }
 
 ====================================================================================================
-ARQUIVO: src/main/java/diarios/coleta/Municipio.java
+ARQUIVO: diarios/coleta/Municipio.java
 DESCRICAO: Código IBGE, nome e UF; gera o "apelido" usado nos nomes de arquivo.
 ====================================================================================================
   1  package diarios.coleta;
@@ -3779,7 +3822,7 @@ DESCRICAO: Código IBGE, nome e UF; gera o "apelido" usado nos nomes de arquivo.
  44  }
 
 ====================================================================================================
-ARQUIVO: src/main/java/diarios/coleta/Fonte.java
+ARQUIVO: diarios/coleta/Fonte.java
 DESCRICAO: Catálogo das 27 capitais e do conjunto padrão de 5 fontes.
 ====================================================================================================
   1  package diarios.coleta;
@@ -3856,7 +3899,7 @@ DESCRICAO: Catálogo das 27 capitais e do conjunto padrão de 5 fontes.
  72  }
 
 ====================================================================================================
-ARQUIVO: src/main/java/diarios/coleta/EstadoFonte.java
+ARQUIVO: diarios/coleta/EstadoFonte.java
 DESCRICAO: Estado de uma fonte: ligada?, status da última tentativa, período coberto.
 ====================================================================================================
   1  package diarios.coleta;
@@ -3947,7 +3990,7 @@ DESCRICAO: Estado de uma fonte: ligada?, status da última tentativa, período c
  86  }
 
 ====================================================================================================
-ARQUIVO: src/main/java/diarios/coleta/Fontes.java
+ARQUIVO: diarios/coleta/Fontes.java
 DESCRICAO: Lista de fontes + persistência em dados/estado/fontes.txt.
 ====================================================================================================
   1  package diarios.coleta;
@@ -4108,7 +4151,7 @@ DESCRICAO: Lista de fontes + persistência em dados/estado/fontes.txt.
 156  }
 
 ====================================================================================================
-ARQUIVO: src/main/java/diarios/coleta/ResultadoColeta.java
+ARQUIVO: diarios/coleta/ResultadoColeta.java
 DESCRICAO: Contadores e registro do que aconteceu com UMA fonte numa rodada.
 ====================================================================================================
   1  package diarios.coleta;
@@ -4155,7 +4198,7 @@ DESCRICAO: Contadores e registro do que aconteceu com UMA fonte numa rodada.
  42  }
 
 ====================================================================================================
-ARQUIVO: src/main/java/diarios/coleta/Rodada.java
+ARQUIVO: diarios/coleta/Rodada.java
 DESCRICAO: Uma coleta (ou descoberta) inteira; grava/relê uma linha em rodadas.txt.
 ====================================================================================================
   1  package diarios.coleta;
@@ -4286,7 +4329,7 @@ DESCRICAO: Uma coleta (ou descoberta) inteira; grava/relê uma linha em rodadas.
 126  }
 
 ====================================================================================================
-ARQUIVO: src/main/java/diarios/servidor/Servidor.java
+ARQUIVO: diarios/servidor/Servidor.java
 DESCRICAO: Sobe o HttpServer do JDK em localhost e liga cada endereço a um método.
 ====================================================================================================
   1  package diarios.servidor;
@@ -4515,7 +4558,7 @@ DESCRICAO: Sobe o HttpServer do JDK em localhost e liga cada endereço a um mét
 224  }
 
 ====================================================================================================
-ARQUIVO: src/main/java/diarios/servidor/Formulario.java
+ARQUIVO: diarios/servidor/Formulario.java
 DESCRICAO: Lê parâmetros de formulário/URL (split, URLDecoder).
 ====================================================================================================
   1  package diarios.servidor;
@@ -4568,7 +4611,7 @@ DESCRICAO: Lê parâmetros de formulário/URL (split, URLDecoder).
  48  }
 
 ====================================================================================================
-ARQUIVO: src/main/java/diarios/servidor/PainelWeb.java
+ARQUIVO: diarios/servidor/PainelWeb.java
 DESCRICAO: Páginas "Painel" e "Coleta e fontes" (HTML montado em ArrayList<String>).
 ====================================================================================================
   1  package diarios.servidor;
@@ -4994,7 +5037,7 @@ DESCRICAO: Páginas "Painel" e "Coleta e fontes" (HTML montado em ArrayList<Stri
 421  }
 
 ====================================================================================================
-ARQUIVO: src/main/java/diarios/servidor/PaginaDiario.java
+ARQUIVO: diarios/servidor/PaginaDiario.java
 DESCRICAO: Páginas de um diário, de um ato (com prova de cada fato) e a busca.
 ====================================================================================================
   1  package diarios.servidor;
@@ -5280,7 +5323,7 @@ DESCRICAO: Páginas de um diário, de um ato (com prova de cada fato) e a busca.
 281  }
 
 ====================================================================================================
-ARQUIVO: src/main/java/diarios/Aplicacao.java
+ARQUIVO: diarios/Aplicacao.java
 DESCRICAO: O "cérebro": processarPasta(), coletar(), descobrir() e a coleta em segundo plano.
 ====================================================================================================
   1  package diarios;
@@ -5591,7 +5634,7 @@ DESCRICAO: O "cérebro": processarPasta(), coletar(), descobrir() e a coleta em 
 306  }
 
 ====================================================================================================
-ARQUIVO: src/main/java/diarios/Principal.java
+ARQUIVO: diarios/Principal.java
 DESCRICAO: Menu de terminal (Scanner + switch); chama a Aplicacao.
 ====================================================================================================
   1  package diarios;
@@ -6082,7 +6125,7 @@ DESCRICAO: Menu de terminal (Scanner + switch); chama a Aplicacao.
 486  }
 
 ====================================================================================================
-ARQUIVO: src/test/java/diarios/Testes.java
+ARQUIVO: test/diarios/Testes.java
 DESCRICAO: 85 verificações com um mini-framework próprio (sem JUnit).
 ====================================================================================================
   1  package diarios;
@@ -6515,3 +6558,930 @@ DESCRICAO: 85 verificações com um mini-framework próprio (sem JUnit).
 428          }
 429      }
 430  }
+
+====================================================================================================
+ARQUIVO: README.md
+DESCRICAO: README do projeto: como rodar, o pipeline e as 11 decisões de projeto (o porquê).
+====================================================================================================
+  1  # Diários Oficiais municipais — coleta, leitura e análise
+  2  
+  3  Java puro, sem nenhuma biblioteca externa. Só o JDK (17 ou mais novo).
+  4  
+  5  O programa sobe um **painel no navegador**, coleta diários oficiais de
+  6  municípios brasileiros, separa cada diário em atos individuais, lê o que cada
+  7  ato faz e produz informação que **não está escrita em nenhum dos documentos**:
+  8  
+  9  1. quanto cada município contratou, com quem, e quais fornecedores se repetem;
+ 10  2. um grafo de quais normas foram alteradas, revogadas ou prorrogadas;
+ 11  3. uma leitura, em português, do que cada ato faz;
+ 12  4. um relatório do que o programa **não conseguiu ler**, e por quê.
+ 13  
+ 14  Tudo é **determinístico**: a mesma pasta de diários produz sempre os mesmos
+ 15  números e as mesmas frases. Nenhuma interpretação usa IA.
+ 16  
+ 17  ---
+ 18  
+ 19  > **Quer entender o código?** Leia o [GUIA_DE_ESTUDO.md](GUIA_DE_ESTUDO.md): a ordem
+ 20  > certa de leitura, com os trechos reais e um plano de estudo.
+ 21  
+ 22  ## Como rodar
+ 23  
+ 24  ### No IntelliJ (recomendado)
+ 25  
+ 26  1. **File → Open** e escolha a pasta **`projeto-diarios`** (a que tem o `pom.xml`).
+ 27  2. Se perguntar, escolha **"Open as Project"** / **"Trust Project"**. O IntelliJ
+ 28     reconhece o Maven e configura tudo sozinho (espere a barra de progresso
+ 29     embaixo terminar).
+ 30  3. Se aparecer *"Project JDK is not defined"*, clique em **Setup SDK** e escolha
+ 31     um JDK 17 ou mais novo.
+ 32  4. Abra `src/main/java/diarios/servidor/Servidor.java`, clique na setinha ▶
+ 33     verde ao lado de `public static void main` e escolha **Run**.
+ 34  
+ 35  O navegador abre sozinho em `http://localhost:8080` e a coleta de 1 dia para
+ 36  trás começa em segundo plano. Para parar: o botão vermelho ■.
+ 37  
+ 38  Para rodar os testes: abra `src/test/java/diarios/Testes.java` e aperte ▶ do
+ 39  mesmo jeito. Para o menu de terminal: `src/main/java/diarios/Principal.java`.
+ 40  
+ 41  > Se o IntelliJ marcar o código todo em vermelho, clique com o botão direito
+ 42  > no `pom.xml` → **Maven → Reload Project**.
+ 43  
+ 44  ### Pelo cmd (sem IntelliJ)
+ 45  
+ 46  Precisa só do JDK 17+ (`javac -version` para conferir).
+ 47  
+ 48  ```
+ 49  rodar.bat      abre o painel
+ 50  testar.bat     roda os 75 testes
+ 51  ```
+ 52  
+ 53  ### Pelo Maven (se tiver instalado)
+ 54  
+ 55  ```
+ 56  mvn package                                  gera target/diarios-oficiais-1.0.jar
+ 57  java -jar target/diarios-oficiais-1.0.jar    abre o painel
+ 58  ```
+ 59  
+ 60  Opções da linha de comando: `--sem-coleta`, `--sem-navegador`, `--porta=9090`.
+ 61  
+ 62  ---
+ 63  
+ 64  ## O que tem no painel
+ 65  
+ 66  | seção | o que faz |
+ 67  |---|---|
+ 68  | **Coleta** | escolhe quantos dias para trás (1 a 90) e coleta das fontes ligadas |
+ 69  | **Descobrir municípios** | pergunta à API quais municípios publicaram texto nos últimos 3 dias e os adiciona à lista |
+ 70  | **Histórico de rodadas** | cada coleta e cada descoberta: quando, período, quantos baixados, quantas falhas |
+ 71  | **Fontes** | todas as fontes com botão de ligar/desligar, status da última tentativa e quantos diários já estão no acervo |
+ 72  | **Busca** | procura uma palavra em todos os diários e leva direto ao ato |
+ 73  | **O que esses dados dizem** | a interpretação do período, em frases geradas por regra |
+ 74  | **Por município** | os números separados por município, para comparar fontes |
+ 75  | **Diários lidos** | cada diário, clicável: atos, leitura de cada um, texto bruto e texto limpo |
+ 76  | **Página do ato** | o que o ato faz, os fatos extraídos, a prova de cada um recortada do texto original, e o texto com os fatos marcados |
+ 77  | funil, portão, fornecedores, grafo, contratos | as análises que já existiam |
+ 78  
+ 79  ### Status de uma fonte
+ 80  
+ 81  | status | significa |
+ 82  |---|---|
+ 83  | `COM_DADO` | baixou diário com texto, ou já tinha na pasta |
+ 84  | `SEM_EDICAO` | a API respondeu, mas não houve edição no período |
+ 85  | `SO_PDF` | houve edição, mas só em PDF escaneado — sem texto |
+ 86  | `FALHOU` | a rede ou a API não respondeu (o motivo aparece ao passar o mouse) |
+ 87  | `NUNCA_TENTADA` | ainda não foi coletada |
+ 88  
+ 89  O estado das fontes (ligada/desligada, último status) fica em
+ 90  `dados/estado/fontes.txt`, e o histórico em `dados/estado/rodadas.txt` — os dois são
+ 91  texto, dá para abrir e conferir.
+ 92  
+ 93  ---
+ 94  
+ 95  ## A coleta
+ 96  
+ 97  Fonte: **[Querido Diário](https://queridodiario.ok.org.br)** (API em `api.queridodiario.org.br`, endereço novo desde set/2026), projeto aberto da
+ 98  Open Knowledge Brasil que agrega diários oficiais de milhares de municípios, com
+ 99  API pública e gratuita.
+100  
+101  A lista começa com as **27 capitais**, com 5 ligadas (Belo Horizonte, Recife,
+102  Fortaleza, Curitiba, Aracaju). Nem todo município tem diário com texto no
+103  Querido Diário — por isso existe o botão **Descobrir municípios com publicação
+104  recente**: em vez de adivinhar quais fontes têm conteúdo, o programa pergunta à
+105  API quem publicou texto nos últimos dias e acrescenta esses municípios à lista
+106  (desligados; você liga os que quiser).
+107  
+108  Cuidados que estão no código:
+109  
+110  - **1 segundo entre requisições** — o servidor é público e gratuito;
+111  - **User-Agent identificando o trabalho**, em vez de fingir ser navegador;
+112  - **diário que já está na pasta não é baixado de novo**;
+113  - **falha de uma fonte não derruba a rodada**: ela fica marcada `FALHOU` com o
+114    motivo, e as outras continuam;
+115  - **uma coleta por vez**: clicar de novo durante uma coleta mostra um aviso.
+116  
+117  ---
+118  
+119  ## Duas peças que não foram dadas em aula
+120  
+121  O professor ensinou até a Aula 05. Duas peças do JDK foram usadas além disso,
+122  porque sem elas o programa não teria como buscar o dado real nem mostrar o
+123  painel:
+124  
+125  | peça | para quê | por que ela |
+126  |---|---|---|
+127  | `java.net.http.HttpClient` | baixar os diários da API | vem no JDK; nenhuma biblioteca externa |
+128  | `com.sun.net.httpserver.HttpServer` | servir o painel em `localhost` | vem no JDK; evita Spring, Tomcat, Maven |
+129  
+130  O resto — ler o JSON da API, ler os formulários do painel, montar o HTML — é
+131  feito à mão com `indexOf`, `substring`, `split` e `StringBuilder`, que são as
+132  Aulas 03 e 04. O painel **não tem JavaScript**: cada botão é um formulário HTML
+133  comum; o Java recebe o clique, faz a ação e devolve a página de novo.
+134  
+135  A coleta roda numa `Thread` separada só para a página não ficar travada
+136  enquanto baixa.
+137  
+138  ---
+139  
+140  ## Arquitetura: um cérebro, duas portas
+141  
+142  ```
+143                   ┌──────────────────────────┐
+144    navegador ───▶ │ servidor/Servidor        │──┐
+145                   └──────────────────────────┘  │
+146                   ┌──────────────────────────┐  ▼
+147    terminal  ───▶ │ Principal (menu)         │─▶ Aplicacao ─▶ coleta · etapas · analise
+148                   └──────────────────────────┘
+149  ```
+150  
+151  `Aplicacao` concentra todo o trabalho (coletar, ler, interpretar). O menu de
+152  console e o painel web só chamam os métodos dela — por isso os números são
+153  sempre os mesmos nos dois.
+154  
+155  ---
+156  
+157  ## O pipeline
+158  
+159  ```
+160     [0] Coleta            API do Querido Diário → diarios/<municipio>_<data>.txt
+161     [1] Ingestão          lista a pasta, lê, guarda o bruto
+162     [2] Limpeza           remove lixo da conversão de PDF
+163          │                RECUSA o diário sem texto aproveitável
+164     [3] Fragmentação      corta o diário em atos individuais
+165          │                só corta com evidência positiva de corpo
+166     [4] Extração          datas, valores, CNPJ, processos, normas
+167          │                cada fato guarda a POSIÇÃO no texto
+168     [5] Portão            ACEITO · DUVIDOSO · REJEITADO, com motivo
+169     [6] Análise           contratos · grafo · interpretação · leitura de cada ato
+170  ```
+171  
+172  ---
+173  
+174  ## Sobre os dados pessoais
+175  
+176  Diários oficiais publicam **CPF completo** de servidores nomeados, exonerados,
+177  licenciados. O painel mostra esses CPFs mascarados (`***.***.***-20`). A máscara
+178  troca caractere por caractere, então o texto mantém o mesmo tamanho e as
+179  posições dos fatos continuam apontando para o lugar certo.
+180  
+181  ---
+182  
+183  ## O que o programa produz
+184  
+185  Sobre os dois diários do corpus que vem junto:
+186  
+187  ```
+188  aracaju_2026-03-11.txt          RECUSADO
+189     motivo: PDF sem texto extraível (provavelmente escaneado)
+190     evidência: 1 linha de corpo em 1.715 linhas
+191  
+192  belo-horizonte_2026-03-25.txt   PROCESSADO
+193     limpeza      : 16.338 linhas → 5.478 removidas como lixo
+194     fragmentação : 225 títulos candidatos → 129 descartados → 96 atos
+195     portão       : ACEITO 66 · DUVIDOSO 30 · REJEITADO 0
+196     contratações : 19, somando R$ 8.323.312,07
+197     grafo        : 6 alterações reais sobre 4 portarias
+198  ```
+199  
+200  Exemplos de leitura de ato, gerados por regra:
+201  
+202  ```
+203  Contrata AÇÕES PARA A CIDADANIA (13.630.795/0001-63) por R$ 700.000,00.
+204    Processo 31.00204095/2026-45.
+205  Ato normativo que altera portaria:074. Vigora desde a publicacao (2026-03-25).
+206  Ato de pessoal: exoneracao. Leitura com ressalva: poucos fatos extraidos (1).
+207  Notificacao ou multa envolvendo 3 CNPJ(s); nao conta como contratacao.
+208  ```
+209  
+210  ---
+211  
+212  ## As decisões de projeto
+213  
+214  Esta seção é a documentação do **porquê**. O código não tem comentários: as
+215  razões estão aqui, onde dá para ler de uma vez.
+216  
+217  ### 1. O texto bruto nunca é alterado
+218  
+219  `Diario` guarda `textoBruto` e `textoLimpo` lado a lado. Se a limpeza ou a
+220  fragmentação tiverem defeito, conserta-se o código e roda de novo. Alterar o
+221  original é a única perda que nenhum conserto futuro alcança.
+222  
+223  ### 2. Recusar é melhor que fingir que leu
+224  
+225  O diário de Aracaju tem **269 páginas** e o texto extraído tem **1 linha de
+226  corpo** — é um PDF escaneado, o conteúdo está em imagem.
+227  
+228  Sem a recusa explícita, o programa devolveria "0 atos", que é indistinguível de
+229  "dia sem publicação". São coisas diferentes, e `DiarioIlegivelException` carrega
+230  o motivo **e a evidência numérica** que sustenta a recusa.
+231  
+232  ### 3. Descartar, nunca remontar
+233  
+234  A marca d'água vertical do PDF ("Documento assinado digitalmente") sai picotada,
+235  uma ou duas letras por linha, no meio do texto — **5.478 das 16.338 linhas** do
+236  diário de BH.
+237  
+238  A tentação é colar os fragmentos de volta em palavras. Foi testado e **piora**:
+239  colar junta o título do ato no parágrafo anterior, e o programa passa a perder
+240  atos que antes achava. Descartar linha curta é seguro — o corpo do documento
+241  está intacto por baixo.
+242  
+243  ### 4. Só fragmenta com evidência positiva
+244  
+245  O diário de Aracaju tem isto:
+246  
+247  ```
+248  DECRETO NUMERADOS - 8512
+249      DECRETO SIMPLES - 2026-02-23
+250      DECRETO SIMPLES - 2026-02-24
+251      ...
+252  ```
+253  
+254  Parece lista de atos. É o **sumário**. Um fragmentador que corta sempre que vê
+255  um título cria 30 atos vazios ali, e a partir daí toda contagem do programa
+256  mente.
+257  
+258  A regra: título só vira ato se houver corpo de texto depois dele. No diário de
+259  BH isso descarta **129 dos 225** títulos candidatos.
+260  
+261  Perder um ato é ruim; inventar 30 é pior, porque o erro não aparece — vira
+262  número no relatório.
+263  
+264  ### 5. Todo fato guarda a posição no texto
+265  
+266  Não é "achei a data 24/03/2026". É "achei `24/03/2026` entre os caracteres
+267  4.502 e 4.512". O método `Fato.provar()` recorta o trecho original em volta, e
+268  a opção 9 do menu mostra isso ato por ato.
+269  
+270  Um extrator sem posição pede para acreditar nele. Um extrator com posição
+271  mostra a prova.
+272  
+273  ### 6. Três saídas no portão, nunca duas
+274  
+275  | erro | acontece o quê |
+276  |---|---|
+277  | deixa passar lixo | **aparece** — alguém lê a saída e vê |
+278  | descarta coisa boa | **não aparece nunca** |
+279  
+280  Com duas saídas, o caso duvidoso é empurrado para um dos lados e some. Com a
+281  terceira, ele fica contável — os 30 DUVIDOSO do BH são a lista do que o
+282  programa ainda não trata.
+283  
+284  `ACEITO` exige sinal positivo. Nenhum caminho leva a "aceita porque não achei
+285  nada errado".
+286  
+287  ### 7. Procurar a palavra não é classificar
+288  
+289  No diário de BH a palavra "altera" aparece **145 vezes** e "prorrog" **125**.
+290  Quase nenhuma fala de norma:
+291  
+292  ```
+293  "Não haverá alteração dos preços ora registrados"        → contrato
+294  "As demais condições permanecem inalteradas"             → contrato
+295  "prorrogação da vigência da Ata de Registro de Preços"   → contrato
+296  "revoga as contratações dos candidatos"                  → pessoal
+297  ```
+298  
+299  Um classificador que só procura a palavra criaria **270 relações falsas** num
+300  diário que tem **5 verdadeiras**. Por isso `GrafoNormas.classificar()` começa
+301  eliminando: citação de fundamento legal ("nos termos do Decreto X") e forma
+302  não-dispositiva viram apenas `CITA`.
+303  
+304  A ordem das regras também importa. Em `O Art. 2º da Portaria SMC nº 073/2025
+305  passa a vigorar`, o trecho começa com "Art.", que é marca de fundamento — mas o
+306  "passa a vigorar" logo depois é evidência mais forte. Na ordem inversa, a única
+307  alteração real do diário virava menção.
+308  
+309  ### 8. Sigla de órgão no meio da citação
+310  
+311  `Portaria SMC nº 073/2025` não era encontrada porque o extrator não passava
+312  pela sigla do órgão — e essa era a **única** alteração de norma do diário
+313  inteiro. `ExtratorReferencia` aceita a sigla, mas só em MAIÚSCULA no texto
+314  original: aceitar minúscula faria "lei que trata do artigo 5" virar citação a
+315  uma lei número 5.
+316  
+317  ### 9. Agrupar por CNPJ, não por nome
+318  
+319  A mesma empresa aparece escrita de várias formas no diário. O CNPJ é o único
+320  campo estável, então o ranking soma por ele.
+321  
+322  ---
+323  
+324  ### 10. Identidade única dentro do diário
+325  
+326  Várias portarias de BH começam com a mesma frase ("Lei Federal nº 13.019/2014 e
+327  ao Decreto Municipal nº 16.746/2017...") e a fragmentação tirava o número
+328  dessa linha. Resultado: dois atos diferentes com a mesma identidade
+329  `lei:13019`, e a leitura de um herdava a alteração do outro — o painel dizia
+330  "altera portaria:073" num ato que, no texto logo abaixo, alterava a **074**.
+331  
+332  Achado olhando a página do ato, não num teste. Agora, dentro do mesmo diário,
+333  uma identidade repetida ganha `#2`, `#3`, e há um teste que trava isso.
+334  
+335  ### 11. A janela depois da citação
+336  
+337  Em `Portaria SMC Nº 074/2025, publicada no DOM em 25 de novembro de 2025,
+338  passa a vigorar`, o verbo fica a ~60 caracteres da citação. Com a janela de
+339  60 a alteração se perdia; com 90 ela aparece, e as 6 alterações encontradas
+340  foram conferidas uma a uma no texto (a busca do painel faz isso em segundos).
+341  
+342  ---
+343  
+344  ## Onde está cada conteúdo de aula
+345  
+346  | pacote | o que faz | conteúdo |
+347  |---|---|---|
+348  | `modelo/` | Diario, Ato, Fato, Contrato, Relacao, Achado | classes, encapsulamento, `equals()` |
+349  | `extratores/` | família de extratores | **herança e polimorfismo** |
+350  | `etapas/` | as etapas do pipeline | `String`, `ArrayList`, arquivos |
+351  | `analise/` | contratos, grafo, interpretação, leitura do ato | agregação, ordenação, percurso em grafo |
+352  | `coleta/` | API, JSON, fontes, rodadas | `String`, `ArrayList`, arquivos, exceções |
+353  | `servidor/` | o painel web | `String`, `StringBuilder` (+ `HttpServer`, ver acima) |
+354  | `erros/` | duas exceções próprias | **exceção personalizada** |
+355  | `Principal.java` | menu de console | `Scanner`, `switch` |
+356  
+357  ---
+358  
+359  ## Estrutura
+360  
+361  ```
+362  projeto-diarios/
+363  ├── pom.xml                     configuracao do Maven (Java 17, sem dependencias)
+364  ├── README.md
+365  ├── rodar.bat · testar.bat      rodar pelo cmd do Windows
+366  ├── dados/
+367  │   ├── diarios/                entrada: um .txt por diario
+368  │   ├── estado/                 fontes ligadas e historico de rodadas (gerado)
+369  │   └── saida/                  relatorios gravados pelo menu (gerado)
+370  └── src/
+371      ├── main/java/diarios/
+372      │   ├── Aplicacao.java      o "cerebro": coletar, ler, interpretar
+373      │   ├── Principal.java      menu de terminal
+374      │   ├── servidor/           painel web: Servidor, PainelWeb, PaginaDiario, Formulario
+375      │   ├── coleta/             API, JSON, fontes, rodadas
+376      │   ├── etapas/             ingestao, limpeza, fragmentacao, extracao, portao
+377      │   ├── extratores/         data, valor, CNPJ, processo, norma (heranca)
+378      │   ├── analise/            contratos, grafo, interpretacao, leitura do ato
+379      │   ├── modelo/             Diario, Ato, Fato, Contrato, Relacao, Achado
+380      │   └── erros/              excecoes proprias
+381      └── test/java/diarios/
+382          └── Testes.java         75 testes sobre dados reais
+383  ```
+
+====================================================================================================
+ARQUIVO: GUIA_DE_ESTUDO.md
+DESCRICAO: Guia de estudo original: ordem de leitura do código e plano de estudo.
+====================================================================================================
+  1  # Guia de estudo — como ler este projeto
+  2  
+  3  Este guia é pra você entender o código **na ordem certa**, sem se perder. Cada
+  4  passo diz o que abrir, o que procurar, e o que perguntar a si mesmo.
+  5  
+  6  ---
+  7  
+  8  ## Parte 0 — O mapa em uma imagem
+  9  
+ 10  O projeto faz UMA coisa: transforma um arquivo de texto gigante (o diário
+ 11  oficial) em informação organizada.
+ 12  
+ 13  ```
+ 14     diário (.txt)                          o que sai
+ 15     ─────────────                          ──────────
+ 16     16.338 linhas misturadas    ──▶  96 atos separados
+ 17                                       ├─ cada um com datas, valores, CNPJs
+ 18                                       ├─ cada um com uma nota (aceito/duvidoso/rejeitado)
+ 19                                       └─ e uma frase dizendo o que ele faz
+ 20  ```
+ 21  
+ 22  Tudo que existe no código serve a uma destas cinco perguntas:
+ 23  
+ 24  | pergunta | pasta | exemplo |
+ 25  |---|---|---|
+ 26  | **o que é** o dado? | `modelo/` | `Ato`, `Fato`, `Diario` |
+ 27  | **de onde vem** o dado? | `coleta/` | `Coletor`, `Fontes` |
+ 28  | **como limpar e separar** o dado? | `etapas/` | `Limpeza`, `Fragmentacao` |
+ 29  | **o que achar** no texto? | `extratores/` | `ExtratorCnpj`, `ExtratorData` |
+ 30  | **o que isso significa**? | `analise/` | `GrafoNormas`, `Interpretacao` |
+ 31  
+ 32  E a pasta `servidor/` só **mostra** o resultado no navegador.
+ 33  
+ 34  > **Regra pra não se perder:** se você está lendo a pasta `servidor/` e não
+ 35  > entende algo, PARE. Ela é só apresentação. O coração do projeto está em
+ 36  > `etapas/` e `extratores/`.
+ 37  
+ 38  ---
+ 39  
+ 40  ## Parte 1 — Comece pelas classes de dados (15 minutos)
+ 41  
+ 42  Abra `modelo/Fato.java`. É a classe mais simples e a mais importante do projeto.
+ 43  
+ 44  ```java
+ 45  public class Fato {
+ 46      private final String tipo;    // "CNPJ", "DATA", "VALOR"...
+ 47      private final String valor;   // "48.356.311/0001-14"
+ 48      private final int inicio;     // em que caractere do texto começa
+ 49      private final int fim;        // em que caractere termina
+ 50  ```
+ 51  
+ 52  **O que entender:** um `Fato` não é só "achei um CNPJ". É "achei este CNPJ,
+ 53  **entre o caractere 4502 e o 4520**". Guardar a posição é a ideia central do
+ 54  trabalho. Com ela o método `provar()` consegue recortar o trecho original e
+ 55  mostrar de onde o dado saiu.
+ 56  
+ 57  **Conceitos de aula aqui:** atributos `private`, construtor, getters
+ 58  (encapsulamento), `equals()` e `hashCode()` (comparar conteúdo, não referência).
+ 59  
+ 60  Depois leia `modelo/Ato.java`. Um `Ato` é um decreto, uma portaria, um extrato
+ 61  de contrato: **a unidade de trabalho do projeto**. Ele tem:
+ 62  - um `texto` (o trecho do diário que é dele),
+ 63  - uma lista de `Fato` (`ArrayList<Fato>`),
+ 64  - uma `decisao` (ACEITO / DUVIDOSO / REJEITADO) e o `motivo`.
+ 65  
+ 66  **Pergunta pra si mesmo:** por que a lista de fatos fica dentro do `Ato` e não
+ 67  solta? *(Porque cada fato pertence a um ato; o ato é quem decide se os fatos
+ 68  bastam.)*
+ 69  
+ 70  Por último, `modelo/Diario.java`: o arquivo inteiro de um dia, com o texto
+ 71  **bruto** e o texto **limpo** lado a lado.
+ 72  
+ 73  ---
+ 74  
+ 75  ## Parte 2 — Herança e polimorfismo (20 minutos)
+ 76  
+ 77  Abra `extratores/Extrator.java`. É uma **classe abstrata**: não se cria um
+ 78  `Extrator`, só se criam as filhas.
+ 79  
+ 80  ```java
+ 81  public abstract class Extrator {
+ 82      public abstract ArrayList<Fato> extrair(String texto);   // cada filha implementa
+ 83      protected Fato criar(String valor, int inicio, int fim)  // atalho reaproveitado
+ 84      protected static boolean casaMolde(String texto, int posicao, String molde)
+ 85  ```
+ 86  
+ 87  Agora abra `extratores/ExtratorCnpj.java` (tem só 25 linhas):
+ 88  
+ 89  ```java
+ 90  public class ExtratorCnpj extends Extrator {
+ 91      private static final String MOLDE = "99.999.999/9999-99";
+ 92  
+ 93      @Override
+ 94      public ArrayList<Fato> extrair(String texto) {
+ 95          ArrayList<Fato> achados = new ArrayList<>();
+ 96          for (int i = 0; i + MOLDE.length() <= texto.length(); i++) {
+ 97              if (casaMolde(texto, i, MOLDE)) {
+ 98                  achados.add(criar(texto.substring(i, i + MOLDE.length()),
+ 99                                    i, i + MOLDE.length()));
+100                  i += MOLDE.length() - 1;
+101              }
+102          }
+103          return achados;
+104      }
+105  }
+106  ```
+107  
+108  **Como funciona o `MOLDE`:** cada `9` significa "qualquer dígito"; qualquer
+109  outro caractere tem que ser igual. O método `casaMolde` (em `Extrator.java`)
+110  anda caractere por caractere comparando. Nenhuma expressão regular: é só
+111  `charAt`, `substring`, `for` (Aula 04).
+112  
+113  **Exercício:** abra `ExtratorData.java` e `ExtratorValor.java`. Todos têm o
+114  mesmo método `extrair`, e cada um faz do seu jeito. Isso é **polimorfismo**
+115  (Aula 02, o exemplo do `FazerSom()` do Cachorro e do Gato).
+116  
+117  Onde o polimorfismo aparece? Em `etapas/Extracao.java`:
+118  
+119  ```java
+120  extratores.add(new ExtratorData());
+121  extratores.add(new ExtratorValor());
+122  extratores.add(new ExtratorCnpj());
+123  ...
+124  for (Extrator e : extratores) {
+125      for (Fato f : e.extrair(ato.getTexto())) { ... }
+126  }
+127  ```
+128  
+129  O laço chama `e.extrair(...)` sem saber qual filha é. Cada uma responde do seu
+130  jeito. **Se você quiser achar CEPs, cria uma classe filha e acrescenta uma
+131  linha. Nada mais muda.**
+132  
+133  ---
+134  
+135  ## Parte 3 — O pipeline, que é o esqueleto do projeto (30 minutos)
+136  
+137  Abra `Aplicacao.java` e ache o método `processarPasta()`. **Este método é o
+138  projeto inteiro em 30 linhas.** Leia devagar:
+139  
+140  ```java
+141  ArrayList<Diario> lidos = new Ingestao(PASTA_DIARIOS).lerTodos(falhas);   // 1
+142  
+143  for (Diario d : lidos) {
+144      try {
+145          limpeza.limpar(d);                                                // 2
+146      } catch (DiarioIlegivelException e) {
+147          novaCobertura.registrarRecusa(...);                               // 2b
+148          novos.add(d);
+149          continue;
+150      }
+151      new Fragmentacao().fragmentar(d);                                     // 3
+152      extracao.extrair(d);                                                  // 4
+153      portao.avaliar(d);                                                    // 5
+154      ...
+155  }
+156  novoPainel.processar(novos);                                              // 6
+157  novoGrafo.processar(novos);                                               // 7
+158  novaInterpretacao.interpretar(...);                                       // 8
+159  ```
+160  
+161  Siga cada número até a classe correspondente:
+162  
+163  ### 1. `etapas/Ingestao.java` — ler a pasta
+164  Lista os `.txt` de `dados/diarios/` e cria um `Diario` para cada um. O nome do
+165  arquivo (`belo-horizonte_2026-03-25.txt`) carrega município e data.
+166  **Aula 05:** `Files`, `DirectoryStream`, `try-with-resources`, `IOException`.
+167  
+168  ### 2. `etapas/Limpeza.java` — limpar e recusar
+169  Leia o método `limpar`. Duas ideias:
+170  - linha com 3 caracteres ou menos é **lixo** (a marca d'água do PDF sai
+171    picotada: `D`, `oc`, `um`...) e é **descartada**;
+172  - se sobrarem menos de 10 linhas longas, o diário é **ilegível** e lança
+173    `DiarioIlegivelException`.
+174  
+175  **Por que lançar exceção, em vez de devolver um número?** Porque "diário
+176  ilegível" não é um erro do programa: é um resultado possível que precisa ser
+177  tratado. Por isso é uma **exceção própria** (Aula 05). Veja em
+178  `erros/DiarioIlegivelException.java` que ela carrega o **motivo** e a
+179  **evidência**.
+180  
+181  ### 3. `etapas/Fragmentacao.java` — cortar em atos
+182  A parte mais difícil. Leia `temCorpo`:
+183  
+184  ```java
+185  private boolean temCorpo(String bloco, String titulo) {
+186      ...
+187      if (semTitulo.trim().length() < CORPO_MINIMO) return false;
+188      for (String l : semTitulo.split("\n")) {
+189          if (l.trim().length() > PARAGRAFO_MINIMO) return true;
+190      }
+191      return false;
+192  }
+193  ```
+194  
+195  **A ideia:** uma linha que começa com "DECRETO" só vira ato se tiver **texto de
+196  verdade depois**. Senão é item de sumário. Na dúvida, **não corta**.
+197  
+198  ### 4. `etapas/Extracao.java` — chamar os extratores
+199  Já vimos na Parte 2.
+200  
+201  ### 5. `etapas/Portao.java` — dar a nota
+202  Leia `avaliarAto`. É só uma sequência de `if`:
+203  
+204  ```
+205  texto curto demais?           → REJEITADO  (com o motivo)
+206  poucos fatos?                 → DUVIDOSO   (com o motivo)
+207  sem número/valor/norma?       → DUVIDOSO
+208  sem nenhuma data?             → DUVIDOSO
+209  passou em tudo                → ACEITO
+210  ```
+211  
+212  **Repare:** só chega em ACEITO quem passou por todos os `if`. **Nenhum caminho
+213  leva a "aceito" por omissão.** E toda decisão grava o `motivo`.
+214  
+215  ### 6, 7, 8. `analise/` — o que significa
+216  Depois de ter os atos com fatos, `analise/` responde perguntas:
+217  - `PainelContratos`: quem foi contratado, por quanto?
+218  - `GrafoNormas`: qual ato altera qual norma?
+219  - `Interpretacao`: as frases do "o que esses dados dizem".
+220  
+221  ---
+222  
+223  ## Parte 4 — Os trechos mais difíceis (leia por último)
+224  
+225  Quando o resto estiver claro, estes três são os que mais custam:
+226  
+227  **`analise/GrafoNormas.classificar()`** — decide se um ato ALTERA, REVOGA,
+228  PRORROGA ou só CITA uma norma. A dificuldade: a palavra "altera" aparece 145
+229  vezes no diário de BH e quase todas são cláusula de contrato ("alteração dos
+230  preços"), não norma. Por isso o método segue uma ordem, e a ordem
+231  importa: (1) olha o trecho **depois** da citação ("...passa a vigorar" ⇒
+232  ALTERA); (2) descarta "fundamento legal" (`nos termos do Decreto X` ⇒ só
+233  CITA); (3) só então procura o verbo **antes** da citação ("revoga o...").
+234  Se nada bater, é só CITA — na dúvida, a relação mais fraca.
+235  
+236  **`analise/PainelContratos.papelENomeAntesDe()`** — descobre se um CNPJ é
+237  fornecedor, ou é o órgão que está multando (`NOTIFICANTE`), ou a empresa
+238  multada (`NOTIFICADO`). Nasceu de um erro real: o programa somava multas como
+239  contratos.
+240  
+241  **`coleta/Coletor.consultarApi()`** — tenta de novo com espera crescente
+242  (5s, 15s, 45s) quando a API recusa por excesso de pedidos.
+243  
+244  ---
+245  
+246  ## Parte 5 — Como ver o código funcionando (o melhor jeito de aprender)
+247  
+248  No IntelliJ, use o **Debug**:
+249  
+250  1. Abra `Aplicacao.java`, vá ao método `processarPasta()`.
+251  2. Clique na **margem esquerda** ao lado da linha `limpeza.limpar(d);` —
+252     aparece uma bolinha vermelha (breakpoint).
+253  3. Rode `Servidor.java` com o botão do **inseto 🐞** (Debug), não o ▶.
+254  4. O programa **para** nessa linha. Embaixo aparece a aba **Variables**:
+255     abra `d` e veja o texto bruto do diário.
+256  5. Aperte **F8** (Step Over) para avançar uma linha por vez, e **F7**
+257     (Step Into) para entrar dentro do método.
+258  
+259  Faça isso com `limpeza.limpar(d)`, depois `fragmentar(d)`, depois
+260  `extracao.extrair(d)`. Em cada passo olhe `d.getAtos()` crescer: primeiro vazio,
+261  depois com 96 atos, depois cada ato com seus fatos.
+262  
+263  **Atalhos que salvam a vida:**
+264  - `Ctrl + clique` num nome → vai pra onde ele foi escrito
+265  - `Alt + ←` → volta
+266  - `Ctrl + Shift + F` → busca um texto no projeto inteiro
+267  
+268  ---
+269  
+270  ## Parte 6 — Como responder na apresentação
+271  
+272  | se o professor perguntar... | aponte para... |
+273  |---|---|
+274  | "Mostra o uso de herança." | `Extrator` + `ExtratorCnpj` (Parte 2) |
+275  | "Mostra tratamento de exceção." | `Limpeza.limpar()` lança, `Aplicacao.processarPasta()` captura |
+276  | "Onde você usa arquivos?" | `Ingestao` (lê), `Relatorio` (escreve), ambos com `try-with-resources` |
+277  | "Onde você usa ArrayList?" | quase em todo lugar: `Ato.fatos`, `Diario.atos`... |
+278  | "Como você sabe que não inventou o dado?" | `Fato.provar()` e a página de um ato no painel |
+279  | "Por que não usou banco?" | não foi dado; arquivo texto dá pra abrir e conferir |
+280  | "O que é essa parte de servidor?" | só mostra o resultado; o trabalho está em `etapas/` |
+281  
+282  ---
+283  
+284  ## Um plano de estudo realista
+285  
+286  | dia | o que fazer | tempo |
+287  |---|---|---|
+288  | 1 | Partes 0 e 1: as classes de `modelo/` | 30 min |
+289  | 1 | Parte 2: `Extrator` e as filhas | 30 min |
+290  | 2 | Parte 3: `processarPasta()` + `Limpeza` + `Portao` | 1 h |
+291  | 2 | Parte 5: debugar `processarPasta()` | 30 min |
+292  | 3 | `Fragmentacao` e `Ingestao` | 1 h |
+293  | 3 | Parte 4: `GrafoNormas` | 1 h |
+294  
+295  **Se sobrar pouco tempo antes da arguição:** domine a Parte 2 (herança) e
+296  a Parte 3 (o pipeline). Com essas duas você responde a maioria das perguntas.
+
+====================================================================================================
+ARQUIVO: PREPARO_ARGUICAO.md
+DESCRICAO: Preparo original para a arguição: perguntas por classe e exercícios.
+====================================================================================================
+  1  # Preparo para a arguição do código
+  2  
+  3  O professor vai **abrir o código e perguntar**. Este material é pra treinar
+  4  isso. Não decore: entenda, e ensaie dizendo em voz alta.
+  5  
+  6  ---
+  7  
+  8  ## 1. Três regras que valem mais que saber tudo
+  9  
+ 10  1. **Nunca invente.** Dizer *"essa parte foi além do que o senhor deu, eu
+ 11     entendo o que ela faz, mas não domino o detalhe"* é muito melhor que
+ 12     inventar e ser pego. Isso vale principalmente para a Seção 4.
+ 13  2. **Responda em duas frases:** *o que faz* + *por que foi feito assim*.
+ 14     Exemplo: *"`temCorpo` só deixa um título virar ato se tiver texto depois
+ 15     dele. Sem isso o sumário do diário virava 30 atos vazios."*
+ 16  3. **Aponte o arquivo e a linha** enquanto fala. Quem mostra o código
+ 17     transmite que conhece o código.
+ 18  
+ 19  ---
+ 20  
+ 21  ## 2. Quem defende o quê (sugestão para 4 pessoas)
+ 22  
+ 23  | pessoa | pacote | o que dominar |
+ 24  |---|---|---|
+ 25  | 1 | `modelo/` + `extratores/` | `Fato`, `Ato`, `Extrator` e as filhas (herança) |
+ 26  | 2 | `etapas/` | `Limpeza`, `Fragmentacao`, `Portao`, `Ingestao`, `Relatorio` |
+ 27  | 3 | `analise/` | `PainelContratos`, `GrafoNormas`, `Interpretacao` |
+ 28  | 4 | `Aplicacao` + `coleta/` + `servidor/` | o fluxo e a parte "fora da aula" |
+ 29  
+ 30  **Todos** precisam saber explicar `Aplicacao.processarPasta()`.
+ 31  
+ 32  ---
+ 33  
+ 34  ## 3. Perguntas por classe
+ 35  
+ 36  ### `Fato.java`
+ 37  - **O que é um Fato?** Um dado achado no texto (CNPJ, data, valor) junto com a
+ 38    posição exata onde foi achado (`inicio` e `fim`).
+ 39  - **Por que guardar a posição?** Para provar de onde saiu. O método `provar()`
+ 40    recorta o trecho original em volta. Sem posição, o programa pediria pra
+ 41    acreditar nele.
+ 42  - **Por que `equals` e `hashCode`?** Dois fatos são iguais se tiverem o mesmo
+ 43    tipo e valor, ignorando a posição. Comparar conteúdo, não referência (Aula 04).
+ 44  - **Por que os atributos são `private final`?** Encapsulamento: ninguém altera
+ 45    um fato depois de criado.
+ 46  
+ 47  ### `Ato.java`
+ 48  - **O que é um Ato?** Um decreto, portaria ou extrato: a unidade de trabalho.
+ 49  - **Como nasce a identidade?** `getIdentidade()` monta
+ 50    `municipio:especie:numero:data` a partir do conteúdo.
+ 51  - **Por que não um contador (1, 2, 3)?** Com contador, rodar de novo geraria
+ 52    identificadores diferentes.
+ 53  - **E se dois atos tiverem a mesma identidade?** `desambiguar()` acrescenta
+ 54    `#2`, `#3`. Foi um bug real: duas portarias começavam com a mesma linha.
+ 55  
+ 56  ### `Extrator` e as filhas (herança e polimorfismo)
+ 57  - **Onde está a herança?** `ExtratorCnpj extends Extrator`.
+ 58  - **Por que `Extrator` é abstrata?** Não faz sentido criar um "extrator
+ 59    genérico". Ela define o contrato (`extrair`) e reaproveita `criar` e
+ 60    `casaMolde`.
+ 61  - **Onde está o polimorfismo?** Em `Extracao`: uma lista de `Extrator` com
+ 62    cinco classes diferentes, e o laço chama `e.extrair()` sem saber qual é qual.
+ 63  - **O que é o `@Override`?** Indica que o método sobrescreve o da classe mãe;
+ 64    o compilador avisa se a assinatura estiver errada.
+ 65  - **Como o `casaMolde` funciona?** `9` = qualquer dígito; o resto tem que ser
+ 66    idêntico. Anda caractere por caractere com `charAt`.
+ 67  
+ 68  ### `Limpeza.java`
+ 69  - **O que faz?** Descarta linha com até 3 caracteres (lixo da marca d'água do
+ 70    PDF) e recusa o diário que não tem texto suficiente.
+ 71  - **Por que descartar e não remontar as letras?** Foi testado: remontar colava
+ 72    o título de um ato no parágrafo anterior e o programa perdia atos.
+ 73  - **Por que lançar exceção?** "Diário ilegível" é um resultado possível, não
+ 74    um bug. `DiarioIlegivelException` (exceção própria, Aula 05) carrega o
+ 75    motivo e a evidência.
+ 76  - **Por que 10 linhas longas como mínimo?** O diário de Aracaju (PDF
+ 77    escaneado) tem 1. O de BH tem mais de 1.000. O limite separa os dois casos.
+ 78  
+ 79  ### `Fragmentacao.java`
+ 80  - **O que faz?** Corta o diário em atos.
+ 81  - **Qual o problema principal?** O sumário parece uma lista de atos.
+ 82  - **Como resolve?** `temCorpo`: o título só vira ato se houver texto de verdade
+ 83    depois. **Na dúvida, não corta.**
+ 84  - **Por que `LEI COMPLEMENTAR` vem antes de `LEI` na lista?** Porque a busca
+ 85    para no primeiro que casa; se `LEI` viesse antes, `LEI COMPLEMENTAR` seria
+ 86    lida como `LEI`.
+ 87  
+ 88  ### `Portao.java`
+ 89  - **Por que três saídas e não duas?** Com duas, o caso duvidoso é empurrado pra
+ 90    um lado e some. Com três, fica contável.
+ 91  - **Como um ato chega em ACEITO?** Passando por todos os `if`. Nenhum caminho
+ 92    leva a aceito por omissão.
+ 93  - **E o motivo?** Toda decisão grava o motivo, inclusive as rejeitadas.
+ 94  
+ 95  ### `Ingestao.java` e `Relatorio.java` (Aula 05)
+ 96  - **Onde usa arquivo?** `Ingestao` lê (`Files.readString`, `DirectoryStream`),
+ 97    `Relatorio` grava (`BufferedWriter`).
+ 98  - **Por que `try-with-resources`?** Fecha o arquivo sozinho, mesmo se der erro.
+ 99  - **E se a pasta não existir?** `Ingestao` captura `IOException`, anota a falha
+100    e devolve lista vazia; o programa não cai.
+101  
+102  ### `PainelContratos.java`
+103  - **Como calcula o ranking?** Agrupa por CNPJ (`indexOf` num `ArrayList`) e
+104    ordena por **seleção**: acha o maior, marca como usado, repete.
+105  - **Qual a complexidade?** O(n²). Com dezenas de fornecedores é instantâneo.
+106    Com milhares, valeria outra estrutura (`HashMap`, ainda não dada).
+107  - **Por que agrupar por CNPJ e não por nome?** O nome vem escrito de várias
+108    formas; o CNPJ não.
+109  - **O que são os papéis (NOTIFICANTE, CONTRATADA)?** Descobrem se o CNPJ é
+110    fornecedor ou é o órgão que está multando. Nasceu de um erro real.
+111  
+112  ### `GrafoNormas.java`
+113  - **O que é o grafo?** Uma lista de arestas: *este ato ALTERA/REVOGA/PRORROGA/
+114    CITA aquela norma*.
+115  - **Por que não procurar só a palavra "altera"?** Ela aparece 145 vezes no
+116    diário de BH e quase todas são cláusula de contrato.
+117  - **Qual a ordem das regras?** (1) verbo depois da citação, (2) fundamento
+118    legal, (3) verbo antes. Na dúvida, a relação mais fraca (`CITA`).
+119  
+120  ### `Coletor.java`
+121  - **Como baixa?** `HttpClient` faz um GET na API do Querido Diário; o JSON é
+122    lido à mão por `Json.java` com `indexOf` e `substring`.
+123  - **E se a API falhar?** Tenta de novo com espera crescente (5s, 15s, 45s) e,
+124    depois de 3 fontes seguidas com falha, a rodada para.
+125  - **Por que `Json.java` à mão?** Não usar biblioteca externa.
+126  
+127  ---
+128  
+129  ## 4. A zona vermelha: o que está além da aula
+130  
+131  O professor já sabe que o scraper é extra. Estes são os outros pontos que ele
+132  pode atacar. **Saiba onde estão e tenha a resposta honesta pronta.**
+133  
+134  | o quê | onde | resposta curta e honesta |
+135  |---|---|---|
+136  | `Thread` | `Aplicacao.coletarEmSegundoPlano` | "A coleta demora, então roda numa linha de execução separada pra página não travar." |
+137  | `synchronized` | `Aplicacao` (vários métodos) | "Duas linhas de execução mexem nos mesmos dados; `synchronized` deixa uma de cada vez. Entendo o motivo, não domino o detalhe." |
+138  | `volatile` | `Aplicacao.ocupado` | "Garante que a outra linha enxergue o valor atualizado." |
+139  | `() ->` (lambda) | `new Thread(() -> {...})` | "É um jeito curto de passar um bloco de código. Equivale a uma classe que implementa `Runnable`." |
+140  | `this::tratarPainel` | `Servidor.iniciar` | "Referência a um método: diz ao servidor qual método chamar em cada endereço." |
+141  | `HttpServer` | `Servidor` | "Vem no JDK; recebe pedido do navegador e devolve a página." |
+142  | `Locale.ROOT` | `Contrato.formatarReal` | "No Windows em português o `String.format` usa vírgula; foi um erro real que só aparecia lá." |
+143  | Maven (`pom.xml`) | raiz | "Formato que o IntelliJ entende; não tem dependência nenhuma." |
+144  
+145  **Se ele perguntar "por que usou isso se não foi dado?"** a resposta é:
+146  *"Sem `HttpClient` não haveria como buscar o dado real, e sem `HttpServer` não
+147  haveria o painel. Usamos só o que já vem no JDK, sem biblioteca externa."*
+148  
+149  ---
+150  
+151  ## 5. Exercícios: "altere o código aqui na minha frente"
+152  
+153  Muito professor pede isso. **Treinem os três até fazer sem olhar.**
+154  
+155  ### Exercício A — achar um tipo novo de dado (CEP)
+156  1. Em `Fato.java`, acrescente `public static final String CEP = "CEP";`
+157  2. Crie `extratores/ExtratorCep.java`:
+158  ```java
+159  public class ExtratorCep extends Extrator {
+160      private static final String MOLDE = "99999-999";
+161  
+162      public ExtratorCep() { super(Fato.CEP); }
+163  
+164      @Override
+165      public ArrayList<Fato> extrair(String texto) {
+166          ArrayList<Fato> achados = new ArrayList<>();
+167          for (int i = 0; i + MOLDE.length() <= texto.length(); i++) {
+168              if (casaMolde(texto, i, MOLDE)) {
+169                  achados.add(criar(texto.substring(i, i + MOLDE.length()),
+170                                    i, i + MOLDE.length()));
+171                  i += MOLDE.length() - 1;
+172              }
+173          }
+174          return achados;
+175      }
+176  }
+177  ```
+178  3. Em `Extracao.java`, no construtor: `extratores.add(new ExtratorCep());`
+179  
+180  **Testado:** no diário de BH acha 4 CEPs reais (ex.: `03333-050`), e os testes
+181  continuam passando.
+182  
+183  **O que isso prova:** polimorfismo. Só acrescentou uma classe e uma linha;
+184  nada mais mudou. (Cuidado: o molde pode pegar pedaço de outro número; se ele
+185  notar, diga que é uma limitação e que o passo seguinte seria checar o que vem
+186  antes e depois.)
+187  
+188  ### Exercício B — deixar o portão mais rígido
+189  Em `Portao.java`, mude `FATOS_MINIMOS = 2` para `3`. **Resultado medido:**
+190  o diário de BH passa de **66 aceitos / 30 duvidosos** para **58 aceitos / 38
+191  duvidosos**. Mostre no painel ("Reler a pasta", depois de recompilar). *Por que isso é bom de mostrar:*
+192  comprova que o limite é um parâmetro, e que o número de "duvidosos" responde
+193  a ele.
+194  
+195  ### Exercício C — reconhecer outro tipo de ato
+196  Em `Fragmentacao.java`, acrescente `"CONVENIO"` à lista `ESPECIES`. Atenção à
+197  ordem: nomes mais longos antes dos curtos.
+198  
+199  ---
+200  
+201  ## 6. Perguntas gerais que costumam aparecer
+202  
+203  - **Por que `ArrayList` e não `HashMap`?** `HashMap` não foi dado. Com dezenas
+204    ou centenas de itens a diferença de tempo não aparece.
+205  - **Por que não usou banco de dados?** Não foi dado; arquivo texto pode ser
+206    aberto e conferido por qualquer pessoa.
+207  - **O que acontece se o diário vier vazio?** `Limpeza` lança
+208    `DiarioIlegivelException`, o diário é recusado com motivo e o programa segue.
+209  - **Como você sabe que o programa acerta?** 85 testes sobre diários reais, mais
+210    a página do ato, que mostra cada fato com o trecho original.
+211  - **Quais são as limitações?** Só foi validado com diários de texto; PDF
+212    escaneado não é lido (precisaria de OCR); alguns nomes de empresa não são
+213    identificados; 31% dos atos ficam em dúvida, e isso aparece no painel.
+214  - **Por que um projeto de diários oficiais?** Dado público, real e bagunçado,
+215    que exige decisões de programação, não só ler arquivo.
+216  
+217  ---
+218  
+219  ## 7. Autoteste (10 minutos, em voz alta)
+220  
+221  1. Explique o que `Aplicacao.processarPasta()` faz, em ordem.
+222  2. O que é um `Fato` e por que guarda a posição?
+223  3. Mostre herança no projeto e diga onde está o polimorfismo.
+224  4. O que a `Limpeza` faz e quando lança exceção?
+225  5. Por que o `Portao` tem três saídas?
+226  6. Como o `Fragmentacao` evita contar o sumário como atos?
+227  7. Por que `ranking()` é O(n²) e por que isso não é problema aqui?
+228  8. Faça o Exercício A sem olhar.
+229  9. Explique o que `synchronized` faz e onde aparece.
+230  10. O que acontece se a API estiver fora do ar?
+231  
+232  Se você errou mais de 3, releia as Partes 2 e 3 do `GUIA_DE_ESTUDO.md` e
+233  debug o `processarPasta()` no IntelliJ.
