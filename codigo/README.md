@@ -1,6 +1,8 @@
 # Diários Oficiais municipais — coleta, leitura e análise
 
-Java puro, sem nenhuma biblioteca externa. Só o JDK (17 ou mais novo).
+O núcleo (coleta, leitura, análise e painel web) é Java puro, só com o JDK 17+.
+A **janela desktop** usa duas bibliotecas: **JavaFX** (interface) e **SQLite JDBC**
+(banco de dados embutido). O Maven baixa as duas sozinho.
 
 O programa sobe um **painel no navegador**, coleta diários oficiais de
 municípios brasileiros, separa cada diário em atos individuais, lê o que cada
@@ -47,7 +49,7 @@ Precisa só do JDK 17+ (`javac -version` para conferir).
 
 ```
 rodar.bat      abre o painel
-testar.bat     roda os 75 testes
+testar.bat     roda os 96 testes
 ```
 
 ### Pelo Maven (se tiver instalado)
@@ -58,6 +60,15 @@ java -jar target/diarios-oficiais-1.0.jar    abre o painel
 ```
 
 Opções da linha de comando: `--sem-coleta`, `--sem-navegador`, `--porta=9090`.
+
+### A janela desktop (JavaFX)
+
+```
+mvn javafx:run          abre a janela
+```
+
+No IntelliJ: rode `diarios.desktop.Abrir` (a classe com `main`). No pacote portátil
+para Windows: dois cliques em `ABRIR_JANELA.bat`.
 
 ---
 
@@ -113,6 +124,30 @@ Cuidados que estão no código:
 - **falha de uma fonte não derruba a rodada**: ela fica marcada `FALHOU` com o
   motivo, e as outras continuam;
 - **uma coleta por vez**: clicar de novo durante uma coleta mostra um aviso.
+
+---
+
+## A janela desktop, o banco e o CSV
+
+| aba | o que mostra | de onde vêm os dados |
+|---|---|---|
+| **Resumo** | números do período e a interpretação em frases | `Aplicacao` (memória) |
+| **Gráficos** | decisão do portão, valor por município, maiores fornecedores | **consultas SQL** no banco |
+| **Atos** | tabela com filtro (texto, decisão, município) e o detalhe de cada ato | `Aplicacao` |
+| **Contratos** | tabela ordenável + botão **Exportar CSV** | `Aplicacao` |
+| **Normas** | o grafo de normas em tabela, filtrável por ação | `Aplicacao` |
+| **Coleta e fontes** | coletar, descobrir, ligar/desligar fontes, histórico | `Aplicacao` |
+
+O botão **Abrir painel web** sobe o servidor HTTP com a **mesma** `Aplicacao`: as duas
+telas mostram sempre os mesmos números, porque a lógica não foi duplicada.
+
+**Banco (`persistencia/Banco.java`).** Depois de cada processamento o resultado é gravado
+em `dados/saida/diarios.db` (SQLite) numa transação: `atos`, `contratos` e `relacoes`.
+Os gráficos usam `GROUP BY`/`SUM`/`COUNT` em vez de laços. O arquivo de texto continua
+sendo a fonte da verdade; o banco é uma cópia para consulta e pode ser apagado.
+
+**CSV (`persistencia/ExportadorCsv.java`).** Separador `;` e UTF-8 com BOM, que é o que
+o Excel em português espera. Campos com `;` ou aspas são protegidos.
 
 ---
 
@@ -379,5 +414,5 @@ projeto-diarios/
     │   ├── modelo/             Diario, Ato, Fato, Contrato, Relacao, Achado
     │   └── erros/              excecoes proprias
     └── test/java/diarios/
-        └── Testes.java         75 testes sobre dados reais
+        └── Testes.java         96 testes sobre dados reais
 ```

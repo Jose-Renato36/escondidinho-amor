@@ -26,6 +26,7 @@ isso. Não decore: entenda, e ensaie dizendo em voz alta.
 | 2 | `etapas/` | `Limpeza`, `Fragmentacao`, `Portao`, `Ingestao`, `Relatorio` |
 | 3 | `analise/` | `PainelContratos`, `GrafoNormas`, `Interpretacao` |
 | 4 | `Aplicacao` + `coleta/` + `servidor/` | o fluxo e a parte "fora da aula" |
+| 5 (ou dividir a 4) | `desktop/` + `persistencia/` | a janela JavaFX, o banco SQLite e o CSV (Seção 3-B) |
 
 **Todos** precisam saber explicar `Aplicacao.processarPasta()`.
 
@@ -126,6 +127,48 @@ isso. Não decore: entenda, e ensaie dizendo em voz alta.
 
 ---
 
+## 3-B. Parte nova: janela JavaFX, banco SQLite e CSV
+
+### `Aba` (interface) e as seis abas
+- **O que é `Aba`?** Uma interface com dois métodos: `getTab()` e `atualizar()`.
+  Cada tela (`AbaResumo`, `AbaGraficos`, `AbaAtos`...) a implementa.
+- **Onde está o polimorfismo?** `Janela` guarda um `ArrayList<Aba>` e, quando os
+  dados mudam, chama `atualizar()` em cada uma sem saber qual é qual.
+- **Por que não duplicar a lógica?** As abas só *mostram*; quem lê e analisa é a
+  mesma `Aplicacao` do painel web.
+
+### `Janela.java`
+- **Como a tela não trava durante o processamento?** `executar()` roda o trabalho
+  numa `Task` (outra thread) e só no `setOnSucceeded` mexe nas abas, de volta na
+  thread da interface. Mexer em tela fora dessa thread dá erro.
+- **Como a aba Coleta sabe que a coleta acabou?** Um `Timeline` pergunta a cada
+  500 ms se `app.isOcupado()`. Quando passa de ocupado para livre, avisa a `Janela`.
+- **Por que existe a classe `Abrir`, separada?** O Java recusa iniciar direto uma
+  classe que estende `Application` se o JavaFX não estiver no module-path. `Abrir`
+  não estende nada e chama `Application.launch`.
+
+### `Banco.java` (SQLite via JDBC)
+- **Por que `PreparedStatement` e não concatenar texto?** Para o valor nunca ser
+  interpretado como SQL (injeção de SQL) e porque permite inserir em lote.
+- **Por que `salvar` usa transação?** Apaga e reinsere tudo; se algo falhar no meio,
+  o `rollback` devolve o banco ao estado anterior em vez de deixá-lo pela metade.
+- **O que `GROUP BY` faz aqui?** `SELECT municipio, SUM(valor) ... GROUP BY municipio`
+  soma por município dentro do banco. Em Java seria um laço com acumulador.
+- **Como sabe que o banco soma certo?** Há teste que compara a soma do SQL com
+  `PainelContratos.total()` e o maior fornecedor do SQL com o de `ranking()`.
+- **Por que a busca escapa `%` e `_`?** No `LIKE` eles são curingas; sem escapar,
+  quem buscasse `%` casaria com tudo.
+- **O que é `try (Banco b = ...)`?** *try-with-resources*: fecha a conexão sozinho,
+  pelo `AutoCloseable`, mesmo se der erro.
+
+### `ExportadorCsv.java`
+- **Por que `;` e BOM?** O Excel em português separa por `;` e só entende acentos em
+  UTF-8 se o arquivo começar com o BOM (`\uFEFF`).
+- **E um nome com `;` ou aspas?** O campo vai entre aspas e as aspas internas são
+  dobradas (`""`). Há teste para isso.
+
+---
+
 ## 4. A zona vermelha: o que está além da aula
 
 O professor já sabe que o scraper é extra. Estes são os outros pontos que ele
@@ -140,11 +183,15 @@ pode atacar. **Saiba onde estão e tenha a resposta honesta pronta.**
 | `this::tratarPainel` | `Servidor.iniciar` | "Referência a um método: diz ao servidor qual método chamar em cada endereço." |
 | `HttpServer` | `Servidor` | "Vem no JDK; recebe pedido do navegador e devolve a página." |
 | `Locale.ROOT` | `Contrato.formatarReal` | "No Windows em português o `String.format` usa vírgula; foi um erro real que só aparecia lá." |
-| Maven (`pom.xml`) | raiz | "Formato que o IntelliJ entende; não tem dependência nenhuma." |
+| Maven (`pom.xml`) | raiz | "Formato que o IntelliJ entende. Declara duas dependências: JavaFX e SQLite JDBC; o Maven baixa as duas." |
+| JavaFX | `desktop/` | "Biblioteca de interface gráfica. Não vem no JDK, por isso entrou como dependência no `pom.xml`." |
+| JDBC / SQLite | `persistencia/Banco` | "JDBC é a API padrão do Java para banco de dados; o SQLite é um banco que mora num arquivo só." |
+| `Task` do JavaFX | `Janela.executar` | "A interface só pode ser mexida pela thread dela. O trabalho pesado roda numa `Task` e, quando termina, a tela é atualizada de volta na thread certa." |
 
 **Se ele perguntar "por que usou isso se não foi dado?"** a resposta é:
 *"Sem `HttpClient` não haveria como buscar o dado real, e sem `HttpServer` não
-haveria o painel. Usamos só o que já vem no JDK, sem biblioteca externa."*
+haveria o painel. O núcleo usa só o que já vem no JDK. A janela desktop e o banco
+foram pedidos pelo professor e usam duas bibliotecas: JavaFX e SQLite JDBC."*
 
 ---
 
@@ -196,17 +243,25 @@ a ele.
 Em `Fragmentacao.java`, acrescente `"CONVENIO"` à lista `ESPECIES`. Atenção à
 ordem: nomes mais longos antes dos curtos.
 
+### Exercício D — uma consulta nova no banco
+Em `Banco.java`, acrescente `contratosPorPapel()` copiando `atosPorDecisao()` e
+trocando o SQL por `SELECT papel, COUNT(*) FROM contratos GROUP BY papel`. Depois
+diga onde ligaria o resultado em `AbaGraficos` (um novo gráfico no `atualizar()`).
+**O que isso prova:** que dá para criar uma consulta nova sem mexer na análise.
+
 ---
 
 ## 6. Perguntas gerais que costumam aparecer
 
 - **Por que `ArrayList` e não `HashMap`?** `HashMap` não foi dado. Com dezenas
   ou centenas de itens a diferença de tempo não aparece.
-- **Por que não usou banco de dados?** Não foi dado; arquivo texto pode ser
-  aberto e conferido por qualquer pessoa.
+- **Por que o banco, se o texto já bastava?** O texto continua sendo a fonte
+  da verdade (qualquer pessoa abre e confere). O banco guarda uma cópia do
+  resultado para consultar com SQL (soma por município, ranking) sem
+  reprocessar tudo, e é o que alimenta os gráficos.
 - **O que acontece se o diário vier vazio?** `Limpeza` lança
   `DiarioIlegivelException`, o diário é recusado com motivo e o programa segue.
-- **Como você sabe que o programa acerta?** 85 testes sobre diários reais, mais
+- **Como você sabe que o programa acerta?** 96 testes sobre diários reais, mais
   a página do ato, que mostra cada fato com o trecho original.
 - **Quais são as limitações?** Só foi validado com diários de texto; PDF
   escaneado não é lido (precisaria de OCR); alguns nomes de empresa não são
@@ -228,6 +283,8 @@ ordem: nomes mais longos antes dos curtos.
 8. Faça o Exercício A sem olhar.
 9. Explique o que `synchronized` faz e onde aparece.
 10. O que acontece se a API estiver fora do ar?
+11. Por que a janela usa `Task` e não faz o trabalho direto no clique do botão?
+12. Por que `salvar` do banco usa transação?
 
 Se você errou mais de 3, releia as Partes 2 e 3 do `GUIA_DE_ESTUDO.md` e
 debug o `processarPasta()` no IntelliJ.

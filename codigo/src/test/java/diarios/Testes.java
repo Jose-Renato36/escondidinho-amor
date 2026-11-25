@@ -27,6 +27,9 @@ import diarios.extratores.ExtratorValor;
 import diarios.modelo.Ato;
 import diarios.modelo.Diario;
 import diarios.modelo.Fato;
+import diarios.persistencia.Banco;
+import diarios.persistencia.ExportadorCsv;
+import java.sql.SQLException;
 import java.util.ArrayList;
 
 public class Testes {
@@ -53,6 +56,7 @@ public class Testes {
         testarFormulario();
         testarPrivacidade();
         testarRodada();
+        testarCsv();
         testarPipelineCompleto();
 
         System.out.println();
@@ -399,6 +403,67 @@ public class Testes {
         conferir("mesma entrada, mesma leitura (deterministico)",
                 leitor.ler(bh.getAtos().get(0), bh.getData()),
                 new LeituraDoAto(painel, grafo).ler(bh.getAtos().get(0), bh.getData()));
+
+        testarBancoComDadosReais(ok, painel, grafo);
+    }
+
+    private static void testarBancoComDadosReais(ArrayList<Diario> ok, PainelContratos painel,
+                                                 GrafoNormas grafo) {
+        System.out.println("-- banco SQLite, sobre os mesmos dados");
+        try (Banco banco = Banco.emMemoria()) {
+            banco.salvar(ok, painel, grafo);
+
+            int totalAtos = 0;
+            for (Diario d : ok) {
+                totalAtos += d.getAtos().size();
+            }
+            conferir("o banco tem todos os atos", totalAtos, banco.contar("atos"));
+            conferir("o banco tem todos os contratos", painel.getContratos().size(),
+                    banco.contar("contratos"));
+            conferir("o banco tem todas as relacoes", grafo.getArestas().size(),
+                    banco.contar("relacoes"));
+
+            double somaSql = 0;
+            for (Object[] linha : banco.valorPorMunicipio()) {
+                somaSql += ((Number) linha[1]).doubleValue();
+            }
+            marcar(Math.abs(somaSql - painel.total()) < 0.01,
+                    "SQL soma o mesmo total que o PainelContratos",
+                    "sql " + somaSql + " x painel " + painel.total());
+
+            ArrayList<String[]> rankingJava = painel.ranking();
+            ArrayList<Object[]> rankingSql = banco.maioresFornecedores(1);
+            conferir("o maior fornecedor no SQL e o mesmo do ranking em Java",
+                    rankingJava.get(0)[0], rankingSql.get(0)[0]);
+
+            banco.salvar(ok, painel, grafo);
+            conferir("salvar de novo troca o conteudo, nao duplica", totalAtos,
+                    banco.contar("atos"));
+            conferirMaiorQue("busca por palavra acha atos", banco.buscarAtos("decreto").size(), 0);
+            conferir("busca trata % como texto, nao como curinga", 0,
+                    banco.buscarAtos("%%%palavra-inexistente%%%").size());
+        } catch (SQLException e) {
+            marcar(false, "banco SQLite", e.getMessage());
+        }
+    }
+
+    private static void testarCsv() {
+        System.out.println("-- ExportadorCsv");
+        try {
+            Path arquivo = Files.createTempFile("diarios-teste", ".csv");
+            ArrayList<String[]> linhas = new ArrayList<>();
+            linhas.add(new String[] {"Padaria \"Boa\"; Ltda", "R$ 1.000,00", null});
+            ExportadorCsv.escrever(arquivo, new String[] {"nome", "valor", "obs"}, linhas);
+            String texto = Files.readString(arquivo, java.nio.charset.StandardCharsets.UTF_8);
+            Files.deleteIfExists(arquivo);
+            conferir("comeca com BOM para o Excel abrir os acentos", true, texto.startsWith("\uFEFF"));
+            conferir("cabecalho separado por ponto e virgula", true,
+                    texto.contains("nome;valor;obs\r\n"));
+            conferir("campo com aspas e ponto e virgula e protegido", true,
+                    texto.contains("\"Padaria \"\"Boa\"\"; Ltda\";R$ 1.000,00;\r\n"));
+        } catch (IOException e) {
+            marcar(false, "ExportadorCsv", e.getMessage());
+        }
     }
 
     private static int contarFatos(Diario d) {

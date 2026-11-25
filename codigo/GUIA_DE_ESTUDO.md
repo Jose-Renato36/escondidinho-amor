@@ -276,7 +276,7 @@ depois com 96 atos, depois cada ato com seus fatos.
 | "Onde você usa arquivos?" | `Ingestao` (lê), `Relatorio` (escreve), ambos com `try-with-resources` |
 | "Onde você usa ArrayList?" | quase em todo lugar: `Ato.fatos`, `Diario.atos`... |
 | "Como você sabe que não inventou o dado?" | `Fato.provar()` e a página de um ato no painel |
-| "Por que não usou banco?" | não foi dado; arquivo texto dá pra abrir e conferir |
+| "Por que não usou banco?" | usou: o texto continua sendo a fonte da verdade e o SQLite guarda uma cópia para consultas (GROUP BY) e gráficos |
 | "O que é essa parte de servidor?" | só mostra o resultado; o trabalho está em `etapas/` |
 
 ---
