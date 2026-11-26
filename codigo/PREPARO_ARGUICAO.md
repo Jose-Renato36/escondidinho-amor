@@ -184,6 +184,7 @@ pode atacar. **Saiba onde estão e tenha a resposta honesta pronta.**
 | `HttpServer` | `Servidor` | "Vem no JDK; recebe pedido do navegador e devolve a página." |
 | `Locale.ROOT` | `Contrato.formatarReal` | "No Windows em português o `String.format` usa vírgula; foi um erro real que só aparecia lá." |
 | Maven (`pom.xml`) | raiz | "Formato que o IntelliJ entende. Declara duas dependências: JavaFX e SQLite JDBC; o Maven baixa as duas." |
+| JUnit 5 | `src/test/.../Testes.java` | "Biblioteca padrão de testes em Java. `@Test` marca o método, `assertEquals` compara o esperado com o obtido, e o `mvn test` roda tudo. O GitHub Actions roda isso a cada push." |
 | JavaFX | `desktop/` | "Biblioteca de interface gráfica. Não vem no JDK, por isso entrou como dependência no `pom.xml`." |
 | JDBC / SQLite | `persistencia/Banco` | "JDBC é a API padrão do Java para banco de dados; o SQLite é um banco que mora num arquivo só." |
 | `Task` do JavaFX | `Janela.executar` | "A interface só pode ser mexida pela thread dela. O trabalho pesado roda numa `Task` e, quando termina, a tela é atualizada de volta na thread certa." |
@@ -261,7 +262,7 @@ diga onde ligaria o resultado em `AbaGraficos` (um novo gráfico no `atualizar()
   reprocessar tudo, e é o que alimenta os gráficos.
 - **O que acontece se o diário vier vazio?** `Limpeza` lança
   `DiarioIlegivelException`, o diário é recusado com motivo e o programa segue.
-- **Como você sabe que o programa acerta?** 96 testes sobre diários reais, mais
+- **Como você sabe que o programa acerta?** 14 testes JUnit 5 (96 verificações) sobre diários reais, mais
   a página do ato, que mostra cada fato com o trecho original.
 - **Quais são as limitações?** Só foi validado com diários de texto; PDF
   escaneado não é lido (precisaria de OCR); alguns nomes de empresa não são

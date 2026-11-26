@@ -37,8 +37,8 @@ números e as mesmas frases. Nenhuma interpretação usa IA.
 O navegador abre sozinho em `http://localhost:8080` e a coleta de 1 dia para
 trás começa em segundo plano. Para parar: o botão vermelho ■.
 
-Para rodar os testes: abra `src/test/java/diarios/Testes.java` e aperte ▶ do
-mesmo jeito. Para o menu de terminal: `src/main/java/diarios/Principal.java`.
+Para rodar os testes: `mvn test`, ou abra `src/test/java/diarios/Testes.java` e aperte ▶
+(são testes **JUnit 5**: 14 métodos com 96 verificações, sobre os diários reais). Para o menu de terminal: `src/main/java/diarios/Principal.java`.
 
 > Se o IntelliJ marcar o código todo em vermelho, clique com o botão direito
 > no `pom.xml` → **Maven → Reload Project**.
@@ -49,7 +49,7 @@ Precisa só do JDK 17+ (`javac -version` para conferir).
 
 ```
 rodar.bat      abre o painel
-testar.bat     roda os 96 testes
+testar.bat     roda os testes (no Maven: mvn test)
 ```
 
 ### Pelo Maven (se tiver instalado)
@@ -414,5 +414,5 @@ projeto-diarios/
     │   ├── modelo/             Diario, Ato, Fato, Contrato, Relacao, Achado
     │   └── erros/              excecoes proprias
     └── test/java/diarios/
-        └── Testes.java         96 testes sobre dados reais
+        └── Testes.java         testes JUnit 5 sobre dados reais
 ```

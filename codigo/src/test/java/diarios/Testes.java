@@ -31,43 +31,30 @@ import diarios.persistencia.Banco;
 import diarios.persistencia.ExportadorCsv;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 
-public class Testes {
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-    private static int passou = 0;
-    private static int falhou = 0;
+class Testes {
 
-    public static void main(String[] args) {
-        System.out.println("TESTES");
-        System.out.println("======");
-        System.out.println();
-
+    @BeforeAll
+    static void usarPortuguesDoBrasil() {
         java.util.Locale.setDefault(java.util.Locale.forLanguageTag("pt-BR"));
-        conferir("formata real em Windows portugues", "R$ 8.323.312,07",
-                diarios.modelo.Contrato.formatarReal(8323312.07));
-        testarExtratorValor();
-        testarExtratorCnpj();
-        testarExtratorReferencia();
-        testarIngestao();
-        testarFonte();
-        testarJson();
-        testarPapeis();
-        testarFontes();
-        testarFormulario();
-        testarPrivacidade();
-        testarRodada();
-        testarCsv();
-        testarPipelineCompleto();
-
-        System.out.println();
-        System.out.println("passou: " + passou + "   falhou: " + falhou);
-        if (falhou > 0) {
-            System.exit(1);
-        }
     }
 
-    private static void testarExtratorValor() {
-        System.out.println("-- ExtratorValor");
+    @Test
+    @DisplayName("formata real em Windows portugues")
+    void formataReal() {
+        conferir("formata real em Windows portugues", "R$ 8.323.312,07",
+                diarios.modelo.Contrato.formatarReal(8323312.07));
+    }
+
+    @Test
+    @DisplayName("ExtratorValor")
+    void testarExtratorValor() {
         ExtratorValor e = new ExtratorValor();
 
         ArrayList<Fato> achados = e.extrair("valor global de R$ 184.500,00 para o exercicio");
@@ -82,8 +69,9 @@ public class Testes {
                 texto.substring(f.getInicio(), f.getFim()));
     }
 
-    private static void testarExtratorCnpj() {
-        System.out.println("-- ExtratorCnpj");
+    @Test
+    @DisplayName("ExtratorCnpj")
+    void testarExtratorCnpj() {
         ExtratorCnpj e = new ExtratorCnpj();
 
         String real = "Deferidos: AKASULO, CNPJ: 48.356.311/0001-14; FLB ATACADO LTDA";
@@ -93,8 +81,9 @@ public class Testes {
         conferir("nao confunde com CPF", 0, e.extrair("CPF 069.555.516-20").size());
     }
 
-    private static void testarExtratorReferencia() {
-        System.out.println("-- ExtratorReferencia");
+    @Test
+    @DisplayName("ExtratorReferencia")
+    void testarExtratorReferencia() {
         ExtratorReferencia e = new ExtratorReferencia();
 
         conferir("lei simples", "lei:11065",
@@ -110,16 +99,18 @@ public class Testes {
                 e.extrair("LEI MUNICIPAL 11065").get(0).getValor());
     }
 
-    private static void testarIngestao() {
-        System.out.println("-- Ingestao");
+    @Test
+    @DisplayName("Ingestao")
+    void testarIngestao() {
         conferir("le o municipio do nome", "belo-horizonte",
                 Ingestao.municipioDe("belo-horizonte_2026-03-25.txt"));
         conferir("le a data do nome", "2026-03-25",
                 Ingestao.dataDe("belo-horizonte_2026-03-25.txt"));
     }
 
-    private static void testarFonte() {
-        System.out.println("-- Fonte");
+    @Test
+    @DisplayName("Fonte")
+    void testarFonte() {
         Fonte f = new Fonte();
         conferir("27 capitais", 27, f.todos().size());
         conferir("acha por nome", "3106200", f.porNome("belo").getCodigo());
@@ -131,8 +122,9 @@ public class Testes {
         conferir("municipio inexistente devolve nulo", true, f.porNome("xyz123") == null);
     }
 
-    private static void testarJson() {
-        System.out.println("-- Json");
+    @Test
+    @DisplayName("Json")
+    void testarJson() {
         String resposta = "{\"total_gazettes\":2,\"gazettes\":["
                 + "{\"date\":\"2026-03-25\",\"txt_url\":\"http://a/1.txt\",\"edition\":\"7466\"},"
                 + "{\"date\":\"2026-03-26\",\"txt_url\":null}]}";
@@ -154,8 +146,9 @@ public class Testes {
         conferir("null sem aspas vira vazio", "", Json.campo(semAspas, "x"));
     }
 
-    private static void testarFontes() {
-        System.out.println("-- Fontes: ligar, desligar e lembrar");
+    @Test
+    @DisplayName("Fontes: ligar, desligar e lembrar")
+    void testarFontes() {
         Path pasta;
         try {
             pasta = Files.createTempDirectory("fontes-teste");
@@ -202,7 +195,6 @@ public class Testes {
         e.registrarResultado("agora", vazio, "2026-03-20", "2026-03-25");
         conferir("sem edicao vira SEM_EDICAO", EstadoFonte.SEM_EDICAO, e.getStatus());
 
-        System.out.println("-- Fontes: quando pular e quando coletar");
         conferir("sem edicao no periodo: pula o mesmo periodo", true,
                 e.jaCobre("2026-03-20", "2026-03-25"));
         conferir("sem edicao: pula periodo menor, dentro do coberto", true,
@@ -244,8 +236,9 @@ public class Testes {
         conferir("fonte nao coletada continua sem cobertura", false,
                 depois.doCodigo("2611606").jaCobre("2026-03-20", "2026-03-25"));    }
 
-    private static void testarFormulario() {
-        System.out.println("-- Formulario");
+    @Test
+    @DisplayName("Formulario")
+    void testarFormulario() {
         conferir("le parametro", "7", Formulario.parametro("dias=7&x=1", "dias"));
         conferir("decodifica espaco e acento", "sao joao",
                 Formulario.parametro("q=sao+jo%C3%A3o", "q").replace("ã", "a"));
@@ -256,8 +249,9 @@ public class Testes {
                         "belo-horizonte_2026-03-25.txt"), "arquivo"));
     }
 
-    private static void testarPrivacidade() {
-        System.out.println("-- Privacidade");
+    @Test
+    @DisplayName("Privacidade")
+    void testarPrivacidade() {
         String original = "servidor, CPF 069.555.516-20, lotado";
         String mascarado = Privacidade.mascararCpf(original);
         conferir("mascara o CPF", "servidor, CPF ***.***.***-20, lotado", mascarado);
@@ -267,8 +261,9 @@ public class Testes {
                 Privacidade.mascararCpf("48.356.311/0001-14"));
     }
 
-    private static void testarRodada() {
-        System.out.println("-- Rodada: historico gravado e relido");
+    @Test
+    @DisplayName("Rodada: historico gravado e relido")
+    void testarRodada() {
         Rodada r = new Rodada("2026-03-25 10:00:00", "coleta", 3, "2026-03-22", "2026-03-25");
         ResultadoColeta rc = new ResultadoColeta(new Municipio("1", "X", "XX"));
         rc.contarBaixado();
@@ -285,8 +280,9 @@ public class Testes {
                 relida.getObservacao());
     }
 
-    private static void testarPapeis() {
-        System.out.println("-- PainelContratos: papel de cada CNPJ");
+    @Test
+    @DisplayName("PainelContratos: papel de cada CNPJ")
+    void testarPapeis() {
 
         String trechoReal = "NOTIFICADO: ACACIA COMERCIO DE MEDICAMENTOS LTDA., CNPJ N "
                 + "03.945.035/0001-91\nNOTIFICANTE: HOSPITAL METROPOLITANO ODILON BEHRENS, "
@@ -314,8 +310,9 @@ public class Testes {
         conferir("multa nao entra no total", 0.0, p.total());
     }
 
-    private static void testarPipelineCompleto() {
-        System.out.println("-- pipeline completo, sobre os diarios reais");
+    @Test
+    @DisplayName("pipeline completo, sobre os diarios reais")
+    void testarPipelineCompleto() {
 
         ArrayList<String> falhas = new ArrayList<>();
         ArrayList<Diario> lidos = new Ingestao(Aplicacao.PASTA_DIARIOS).lerTodos(falhas);
@@ -409,7 +406,6 @@ public class Testes {
 
     private static void testarBancoComDadosReais(ArrayList<Diario> ok, PainelContratos painel,
                                                  GrafoNormas grafo) {
-        System.out.println("-- banco SQLite, sobre os mesmos dados");
         try (Banco banco = Banco.emMemoria()) {
             banco.salvar(ok, painel, grafo);
 
@@ -447,8 +443,9 @@ public class Testes {
         }
     }
 
-    private static void testarCsv() {
-        System.out.println("-- ExportadorCsv");
+    @Test
+    @DisplayName("ExportadorCsv")
+    void testarCsv() {
         try {
             Path arquivo = Files.createTempFile("diarios-teste", ".csv");
             ArrayList<String[]> linhas = new ArrayList<>();
@@ -475,21 +472,14 @@ public class Testes {
     }
 
     private static void conferir(String nome, Object esperado, Object obtido) {
-        marcar(esperado.equals(obtido), nome,
-                "esperado <" + esperado + ">, obtido <" + obtido + ">");
+        assertEquals(esperado, obtido, nome);
     }
 
     private static void conferirMaiorQue(String nome, int obtido, int minimo) {
-        marcar(obtido > minimo, nome, "esperado > " + minimo + ", obtido " + obtido);
+        assertTrue(obtido > minimo, nome + ": esperado > " + minimo + ", obtido " + obtido);
     }
 
     private static void marcar(boolean ok, String nome, String detalhe) {
-        if (ok) {
-            passou++;
-            System.out.println("   ok   " + nome);
-        } else {
-            falhou++;
-            System.out.println("   FALHOU  " + nome + " - " + detalhe);
-        }
+        assertTrue(ok, nome + " - " + detalhe);
     }
 }
