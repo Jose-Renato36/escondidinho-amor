@@ -139,7 +139,7 @@ public class Interpretacao {
     }
 
     private void concentracaoDeGasto(PainelContratos painel) {
-        ArrayList<String[]> ranking = painel.ranking();
+        ArrayList<Fornecedor> ranking = painel.ranking();
         double total = painel.total();
         if (ranking.size() < 3 || total <= 0) {
             return;
@@ -148,8 +148,8 @@ public class Interpretacao {
         double top3 = 0;
         StringBuilder nomes = new StringBuilder();
         for (int i = 0; i < 3; i++) {
-            top3 += valorDe(ranking.get(i)[2]);
-            nomes.append(i > 0 ? ", " : "").append(ranking.get(i)[1]);
+            top3 += ranking.get(i).getTotal();
+            nomes.append(i > 0 ? ", " : "").append(ranking.get(i).getNome());
         }
         int pct = (int) Math.round(top3 * 100 / total);
 
@@ -196,15 +196,15 @@ public class Interpretacao {
     }
 
     private void fornecedorRepetido(PainelContratos painel) {
-        ArrayList<String[]> repetidos = painel.repeticoes(REPETICAO_MINIMA);
+        ArrayList<Fornecedor> repetidos = painel.repeticoes(REPETICAO_MINIMA);
         if (repetidos.isEmpty()) {
             return;
         }
 
         StringBuilder lista = new StringBuilder();
-        for (String[] r : repetidos) {
-            lista.append(lista.length() > 0 ? "; " : "").append(r[1]).append(" ")
-                 .append(r[3]).append("x");
+        for (Fornecedor r : repetidos) {
+            lista.append(lista.length() > 0 ? "; " : "").append(r.getNome()).append(" ")
+                 .append(r.getContratos()).append("x");
         }
 
         achados.add(new Achado(Achado.ATENCAO,
@@ -378,22 +378,6 @@ public class Interpretacao {
         return menor.equals(maior) ? menor : menor + " a " + maior;
     }
 
-    private double valorDe(String formatado) {
-        StringBuilder n = new StringBuilder();
-        for (int i = 0; i < formatado.length(); i++) {
-            char c = formatado.charAt(i);
-            if (c >= '0' && c <= '9') {
-                n.append(c);
-            } else if (c == ',') {
-                n.append('.');
-            }
-        }
-        try {
-            return Double.parseDouble(n.toString());
-        } catch (NumberFormatException e) {
-            return 0.0;
-        }
-    }
 
     public String getResumo() {
         return resumo;

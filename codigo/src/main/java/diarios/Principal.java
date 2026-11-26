@@ -1,5 +1,6 @@
 package diarios;
 
+import diarios.analise.Fornecedor;
 import diarios.coleta.EstadoFonte;
 import diarios.coleta.Rodada;
 import diarios.etapas.PaginaHtml;
@@ -276,11 +277,12 @@ public class Principal {
         System.out.printf("  %-20s %-38s %18s %6s%n", "CNPJ", "CONTRATADA", "TOTAL", "VEZES");
         System.out.println("  " + "-".repeat(84));
 
-        ArrayList<String[]> ranking = app.getPainel().ranking();
+        ArrayList<Fornecedor> ranking = app.getPainel().ranking();
         int mostrar = Math.min(15, ranking.size());
         for (int i = 0; i < mostrar; i++) {
-            String[] r = ranking.get(i);
-            System.out.printf("  %-20s %-38s %18s %6s%n", r[0], corta(r[1], 38), r[2], r[3]);
+            Fornecedor r = ranking.get(i);
+            System.out.printf("  %-20s %-38s %18s %6d%n", r.getCnpj(), corta(r.getNome(), 38),
+                    r.getTotalFormatado(), r.getContratos());
         }
         if (ranking.size() > mostrar) {
             System.out.println("  ... e mais " + (ranking.size() - mostrar) + " fornecedor(es)");
@@ -428,8 +430,9 @@ public class Principal {
         l.add("");
         l.add("RANKING DE FORNECEDORES");
         l.add("cnpj;contratada;total;vezes");
-        for (String[] r : app.getPainel().ranking()) {
-            l.add(String.join(";", r[0], r[1].replace(';', ','), r[2], r[3]));
+        for (Fornecedor r : app.getPainel().ranking()) {
+            l.add(String.join(";", r.getCnpj(), r.getNome().replace(';', ','),
+                    r.getTotalFormatado(), String.valueOf(r.getContratos())));
         }
         return l;
     }

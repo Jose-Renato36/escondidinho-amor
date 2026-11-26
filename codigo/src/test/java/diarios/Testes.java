@@ -428,10 +428,10 @@ class Testes {
                     "SQL soma o mesmo total que o PainelContratos",
                     "sql " + somaSql + " x painel " + painel.total());
 
-            ArrayList<String[]> rankingJava = painel.ranking();
+            ArrayList<diarios.analise.Fornecedor> rankingJava = painel.ranking();
             ArrayList<Object[]> rankingSql = banco.maioresFornecedores(1);
             conferir("o maior fornecedor no SQL e o mesmo do ranking em Java",
-                    rankingJava.get(0)[0], rankingSql.get(0)[0]);
+                    rankingJava.get(0).getCnpj(), rankingSql.get(0)[0]);
 
             banco.salvar(ok, painel, grafo);
             conferir("salvar de novo troca o conteudo, nao duplica", totalAtos,

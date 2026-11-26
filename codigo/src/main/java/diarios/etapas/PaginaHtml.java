@@ -1,6 +1,7 @@
 package diarios.etapas;
 
 import diarios.analise.Cobertura;
+import diarios.analise.Fornecedor;
 import diarios.analise.GrafoNormas;
 import diarios.analise.Interpretacao;
 import diarios.analise.PainelContratos;
@@ -222,7 +223,7 @@ public class PaginaHtml {
         h.add("</div>");
     }
     public void secaoFornecedores(ArrayList<String> h, PainelContratos painel) {
-        ArrayList<String[]> ranking = painel.ranking();
+        ArrayList<Fornecedor> ranking = painel.ranking();
         if (ranking.isEmpty()) {
             return;
         }
@@ -231,28 +232,28 @@ public class PaginaHtml {
         h.add("<p class=\"nota\">Somado por CNPJ &mdash; o nome da empresa aparece "
                 + "escrito de varias formas no diario, o CNPJ nao.</p>");
 
-        double maior = valorDe(ranking.get(0)[2]);
+        double maior = ranking.get(0).getTotal();
         int mostrar = Math.min(10, ranking.size());
 
         h.add("<div class=\"grafico\">");
         for (int i = 0; i < mostrar; i++) {
-            String[] r = ranking.get(i);
-            double v = valorDe(r[2]);
-            int pct = maior > 0 ? (int) Math.round(v * 100 / maior) : 0;
-            String dica = r[1] + " - " + r[2] + " em " + r[3] + " contrato(s)";
+            Fornecedor r = ranking.get(i);
+            int pct = maior > 0 ? (int) Math.round(r.getTotal() * 100 / maior) : 0;
+            String dica = r.getNome() + " - " + r.getTotalFormatado() + " em " + r.getContratos()
+                    + " contrato(s)";
 
             h.add("<div class=\"linha\">");
-            h.add("<div class=\"rotulo\" title=\"" + escapar(r[0]) + "\">"
-                    + escapar(cortar(r[1], 34)) + "</div>");
+            h.add("<div class=\"rotulo\" title=\"" + escapar(r.getCnpj()) + "\">"
+                    + escapar(cortar(r.getNome(), 34)) + "</div>");
             h.add("<div class=\"trilho\" data-dica=\"" + escapar(dica) + "\">");
             h.add("<div class=\"barra\" style=\"width:" + Math.max(pct, 1) + "%\"></div>");
             h.add("</div>");
-            h.add("<div class=\"valor\">" + escapar(r[2]) + "</div>");
+            h.add("<div class=\"valor\">" + escapar(r.getTotalFormatado()) + "</div>");
             h.add("</div>");
         }
         h.add("</div>");
 
-        ArrayList<String[]> repetidos = painel.repeticoes(3);
+        ArrayList<Fornecedor> repetidos = painel.repeticoes(3);
         if (!repetidos.isEmpty()) {
             h.add("<div class=\"aviso\">");
             h.add("<span class=\"ic ic-duv\">&#9888;</span>");
@@ -261,10 +262,10 @@ public class PaginaHtml {
                     + "explicacao legitima (ata de registro de precos, fornecedor unico). "
                     + "Serve para saber onde olhar.</p>");
             h.add("<ul>");
-            for (String[] r : repetidos) {
-                h.add("<li><strong>" + escapar(r[3]) + "x</strong> "
-                        + escapar(r[1]) + " <span class=\"mono\">" + escapar(r[0])
-                        + "</span> &mdash; " + escapar(r[2]) + "</li>");
+            for (Fornecedor r : repetidos) {
+                h.add("<li><strong>" + r.getContratos() + "x</strong> "
+                        + escapar(r.getNome()) + " <span class=\"mono\">" + escapar(r.getCnpj())
+                        + "</span> &mdash; " + escapar(r.getTotalFormatado()) + "</li>");
             }
             h.add("</ul></div></div>");
         }
@@ -360,22 +361,6 @@ public class PaginaHtml {
         h.add("<p>Dados: <span class=\"mono\">Querido Diario</span>, "
                 + "Open Knowledge Brasil.</p>");
         h.add("</footer>");
-    }
-    private double valorDe(String formatado) {
-        StringBuilder n = new StringBuilder();
-        for (int i = 0; i < formatado.length(); i++) {
-            char c = formatado.charAt(i);
-            if (c >= '0' && c <= '9') {
-                n.append(c);
-            } else if (c == ',') {
-                n.append('.');
-            }
-        }
-        try {
-            return Double.parseDouble(n.toString());
-        } catch (NumberFormatException e) {
-            return 0.0;
-        }
     }
 
     public static String cortar(String s, int max) {

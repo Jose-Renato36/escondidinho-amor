@@ -277,51 +277,36 @@ public class PainelContratos {
         return soma;
     }
 
-    public ArrayList<String[]> ranking() {
-        ArrayList<String> cnpjs = new ArrayList<>();
-        ArrayList<String> nomes = new ArrayList<>();
-        ArrayList<Double> somas = new ArrayList<>();
-        ArrayList<Integer> vezes = new ArrayList<>();
-
+    /** Fornecedores somados por CNPJ, do que mais recebeu para o que menos recebeu. */
+    public ArrayList<Fornecedor> ranking() {
+        ArrayList<Fornecedor> fornecedores = new ArrayList<>();
         for (Contrato c : contratos) {
-            int i = cnpjs.indexOf(c.getCnpj());
-            if (i < 0) {
-                cnpjs.add(c.getCnpj());
-                nomes.add(c.getContratada());
-                somas.add(c.getValor());
-                vezes.add(1);
-            } else {
-                somas.set(i, somas.get(i) + c.getValor());
-                vezes.set(i, vezes.get(i) + 1);
-                if (nomes.get(i).equals("(nao identificada)")) {
-                    nomes.set(i, c.getContratada());
-                }
+            Fornecedor f = buscar(fornecedores, c.getCnpj());
+            if (f == null) {
+                f = new Fornecedor(c.getCnpj(), c.getContratada());
+                fornecedores.add(f);
             }
+            f.somar(c);
         }
-
-        ArrayList<String[]> linhas = new ArrayList<>();
-        boolean[] usado = new boolean[cnpjs.size()];
-        for (int n = 0; n < cnpjs.size(); n++) {
-            int melhor = -1;
-            for (int i = 0; i < cnpjs.size(); i++) {
-                if (!usado[i] && (melhor < 0 || somas.get(i) > somas.get(melhor))) {
-                    melhor = i;
-                }
-            }
-            usado[melhor] = true;
-            linhas.add(new String[] {
-                cnpjs.get(melhor), nomes.get(melhor),
-                Contrato.formatarReal(somas.get(melhor)), String.valueOf(vezes.get(melhor))
-            });
-        }
-        return linhas;
+        // sort e estavel: empatados ficam na ordem em que apareceram nos diarios
+        fornecedores.sort((x, y) -> Double.compare(y.getTotal(), x.getTotal()));
+        return fornecedores;
     }
 
-    public ArrayList<String[]> repeticoes(int minimo) {
-        ArrayList<String[]> alertas = new ArrayList<>();
-        for (String[] linha : ranking()) {
-            if (Integer.parseInt(linha[3]) >= minimo) {
-                alertas.add(linha);
+    private static Fornecedor buscar(ArrayList<Fornecedor> lista, String cnpj) {
+        for (Fornecedor f : lista) {
+            if (f.getCnpj().equals(cnpj)) {
+                return f;
+            }
+        }
+        return null;
+    }
+
+    public ArrayList<Fornecedor> repeticoes(int minimo) {
+        ArrayList<Fornecedor> alertas = new ArrayList<>();
+        for (Fornecedor f : ranking()) {
+            if (f.getContratos() >= minimo) {
+                alertas.add(f);
             }
         }
         return alertas;
