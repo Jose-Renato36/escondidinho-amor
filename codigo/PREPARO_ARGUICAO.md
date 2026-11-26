@@ -161,6 +161,26 @@ isso. Não decore: entenda, e ensaie dizendo em voz alta.
 - **O que é `try (Banco b = ...)`?** *try-with-resources*: fecha a conexão sozinho,
   pelo `AutoCloseable`, mesmo se der erro.
 
+### `Cnpj`, `Empresa`, `ClienteBrasilApi`, `ServicoEmpresas`
+- **Como o dígito verificador funciona?** Cada um dos 12 primeiros dígitos é multiplicado por um peso
+  (5,4,3,2,9,8,7,6,5,4,3,2); soma-se, tira-se o resto da divisão por 11 e `resto < 2 ? 0 : 11 - resto` é o
+  13º dígito. Repete-se com 13 dígitos e pesos `6,5,4,...` para o 14º. Está em `Cnpj.digito`.
+- **Por que validar antes de consultar?** Número com dígito errado não existe: não gasta consulta nem
+  espera 1 s. E o erro vira um *sinal*: no diário de 25/03/2026 há um CNPJ digitado errado.
+- **Por que o cache fica no banco?** Para a segunda consulta da mesma empresa não usar internet, e porque
+  `salvar()` só apaga atos, contratos e relações, **não** as empresas.
+- **Por que o cliente recebe a URL no construtor?** Para o teste apontar para um servidor local
+  (`HttpServer` do JDK) em vez da internet. Ninguém precisa de rede para rodar os testes.
+- **O que acontece se a BrasilAPI cair?** `ColetaException` com o motivo; a janela mostra e continua.
+- **Por que `Empresa.deJson` é "tolerante"?** Campo que não veio vira vazio. O formato real só se
+  confirma na primeira consulta de verdade; o teste usa um JSON de exemplo escrito à mão.
+
+### `SinaisDaEmpresa`
+- **Isso é uma acusação?** Não. Cada sinal traz o que ele **não prova** (empresa nova pode ganhar contrato
+  legitimamente; capital baixo é comum em empresa pequena). É uma regra com limite, testada nos limites
+  (12 meses, 10 vezes o capital).
+- **Por que não usar IA?** Regra é explicável: dá para mostrar a linha que gerou cada sinal.
+
 ### `ExportadorCsv.java`
 - **Por que `;` e BOM?** O Excel em português separa por `;` e só entende acentos em
   UTF-8 se o arquivo começar com o BOM (`\uFEFF`).
@@ -185,6 +205,9 @@ pode atacar. **Saiba onde estão e tenha a resposta honesta pronta.**
 | `Locale.ROOT` | `Contrato.formatarReal` | "No Windows em português o `String.format` usa vírgula; foi um erro real que só aparecia lá." |
 | Maven (`pom.xml`) | raiz | "Formato que o IntelliJ entende. Declara duas dependências: JavaFX e SQLite JDBC; o Maven baixa as duas." |
 | JUnit 5 | `src/test/.../Testes.java` | "Biblioteca padrão de testes em Java. `@Test` marca o método, `assertEquals` compara o esperado com o obtido, e o `mvn test` roda tudo. O GitHub Actions roda isso a cada push." |
+| Jackson | `coleta/Json`, `empresas/Empresa` | "Biblioteca que lê JSON. Antes tínhamos um leitor feito à mão (109 linhas); agora são 40, e o Jackson já trata acento escapado, `null` e aninhamento." |
+| `HttpClient` + cache | `empresas/` | "Consulta a BrasilAPI; a resposta fica no banco, então a segunda vez não usa rede." |
+| `enum` | `modelo/Decisao`, `Acao`, `TipoFato` | "Um conjunto fixo de valores. Trocou os textos soltos como \"ACEITO\": errar a digitação vira erro de compilação." |
 | JavaFX | `desktop/` | "Biblioteca de interface gráfica. Não vem no JDK, por isso entrou como dependência no `pom.xml`." |
 | JDBC / SQLite | `persistencia/Banco` | "JDBC é a API padrão do Java para banco de dados; o SQLite é um banco que mora num arquivo só." |
 | `Task` do JavaFX | `Janela.executar` | "A interface só pode ser mexida pela thread dela. O trabalho pesado roda numa `Task` e, quando termina, a tela é atualizada de volta na thread certa." |
@@ -262,7 +285,7 @@ diga onde ligaria o resultado em `AbaGraficos` (um novo gráfico no `atualizar()
   reprocessar tudo, e é o que alimenta os gráficos.
 - **O que acontece se o diário vier vazio?** `Limpeza` lança
   `DiarioIlegivelException`, o diário é recusado com motivo e o programa segue.
-- **Como você sabe que o programa acerta?** 14 testes JUnit 5 (96 verificações) sobre diários reais, mais
+- **Como você sabe que o programa acerta?** 29 testes JUnit 5 sobre diários reais, mais
   a página do ato, que mostra cada fato com o trecho original.
 - **Quais são as limitações?** Só foi validado com diários de texto; PDF
   escaneado não é lido (precisaria de OCR); alguns nomes de empresa não são
@@ -286,6 +309,9 @@ diga onde ligaria o resultado em `AbaGraficos` (um novo gráfico no `atualizar()
 10. O que acontece se a API estiver fora do ar?
 11. Por que a janela usa `Task` e não faz o trabalho direto no clique do botão?
 12. Por que `salvar` do banco usa transação?
+13. Como o dígito verificador do CNPJ é calculado? Mostre em `Cnpj.digito`.
+14. Por que a consulta de CNPJ só acontece ao clicar, e por que existe o cache?
+15. Cite um sinal de atenção e diga o que ele **não** prova.
 
 Se você errou mais de 3, releia as Partes 2 e 3 do `GUIA_DE_ESTUDO.md` e
 debug o `processarPasta()` no IntelliJ.

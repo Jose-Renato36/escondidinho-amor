@@ -42,6 +42,7 @@ final class Estilo {
         n.getStyleClass().add("tile-numero");
         Label t = new Label(nome);
         t.getStyleClass().add("tile-nome");
+        t.setWrapText(true);
         VBox caixa = new VBox(2, n, t);
         caixa.getStyleClass().add("tile");
         caixa.setPadding(new Insets(14, 18, 14, 18));

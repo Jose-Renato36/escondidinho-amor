@@ -11,6 +11,7 @@ import diarios.modelo.Contrato;
 import java.sql.SQLException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.Optional;
 import javafx.collections.FXCollections;
 import javafx.concurrent.Task;
@@ -19,6 +20,7 @@ import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.ProgressBar;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.SplitPane;
 import javafx.scene.control.TableCell;
@@ -26,6 +28,7 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 
@@ -40,7 +43,10 @@ public class AbaEmpresas implements Aba {
 
     private final Aplicacao app;
     private final ServicoEmpresas servico;
-    private final TableView<Fornecedor> tabela = new TableView<>();
+    private final TableView<Linha> tabela = new TableView<>();
+    private final Button consultarTodas = new Button("Consultar todas");
+    private final ProgressBar progresso = new ProgressBar(0);
+    private final Label andamento = new Label();
     private final VBox ficha = new VBox(14);
     private final Node conteudo;
 
@@ -53,19 +59,30 @@ public class AbaEmpresas implements Aba {
         ScrollPane rolagem = new ScrollPane(ficha);
         rolagem.setFitToWidth(true);
 
-        SplitPane divisao = new SplitPane(tabela, rolagem);
-        divisao.setDividerPositions(0.6);
+        consultarTodas.getStyleClass().add("accent");
+        consultarTodas.setOnAction(e -> consultarTodasAsEmpresas());
+        progresso.setPrefWidth(120);
+        progresso.setVisible(false);
+        HBox barra = new HBox(10, consultarTodas, progresso, andamento);
+        barra.setAlignment(Pos.CENTER_LEFT);
+        barra.setPadding(new Insets(10, 12, 10, 12));
+        VBox.setVgrow(tabela, Priority.ALWAYS);
+        VBox esquerda = new VBox(barra, tabela);
+
+        SplitPane divisao = new SplitPane(esquerda, rolagem);
+        divisao.setDividerPositions(0.62);
         conteudo = divisao;
 
-        tabela.getSelectionModel().selectedItemProperty().addListener((o, antes, agora) -> mostrar(agora));
+        tabela.getSelectionModel().selectedItemProperty().addListener((o, antes, agora) ->
+                mostrar(agora == null ? null : agora.fornecedor));
         mostrar(null);
     }
 
     private void montarTabela() {
-        TableColumn<Fornecedor, String> nome = Tabelas.<Fornecedor>texto("Fornecedor", 190,
-                f -> Estilo.cortar(f.getNome(), 38));
-        TableColumn<Fornecedor, String> cnpj = Tabelas.<Fornecedor>texto("CNPJ", 165,
-                f -> Cnpj.formatar(f.getCnpj()));
+        TableColumn<Linha, String> nome = Tabelas.<Linha>texto("Fornecedor", 170,
+                l -> Estilo.cortar(l.fornecedor.getNome(), 38));
+        TableColumn<Linha, String> cnpj = Tabelas.<Linha>texto("CNPJ", 160,
+                l -> Cnpj.formatar(l.fornecedor.getCnpj()));
         cnpj.setCellFactory(c -> new TableCell<>() {
             @Override
             protected void updateItem(String item, boolean vazio) {
@@ -76,9 +93,9 @@ public class AbaEmpresas implements Aba {
                 setTooltip(invalido ? new javafx.scene.control.Tooltip("Digito verificador invalido") : null);
             }
         });
-        TableColumn<Fornecedor, Double> total = new TableColumn<>("Total contratado");
-        total.setPrefWidth(135);
-        total.setCellValueFactory(v -> new javafx.beans.property.SimpleObjectProperty<>(v.getValue().getTotal()));
+        TableColumn<Linha, Double> total = new TableColumn<>("Total contratado");
+        total.setPrefWidth(125);
+        total.setCellValueFactory(v -> new javafx.beans.property.SimpleObjectProperty<>(v.getValue().fornecedor.getTotal()));
         total.setCellFactory(c -> new TableCell<>() {
             @Override
             protected void updateItem(Double item, boolean vazio) {
@@ -87,10 +104,22 @@ public class AbaEmpresas implements Aba {
                 setAlignment(Pos.CENTER_RIGHT);
             }
         });
-        TableColumn<Fornecedor, Integer> vezes = new TableColumn<>("Contratos");
-        vezes.setPrefWidth(85);
-        vezes.setCellValueFactory(v -> new javafx.beans.property.SimpleObjectProperty<>(v.getValue().getContratos()));
-        tabela.getColumns().addAll(java.util.List.of(nome, cnpj, total, vezes));
+        TableColumn<Linha, Integer> vezes = new TableColumn<>("Contratos");
+        vezes.setPrefWidth(80);
+        vezes.setCellValueFactory(v -> new javafx.beans.property.SimpleObjectProperty<>(v.getValue().fornecedor.getContratos()));
+        TableColumn<Linha, Integer> sinais = new TableColumn<>("Sinais");
+        sinais.setPrefWidth(65);
+        sinais.setCellValueFactory(v -> new javafx.beans.property.SimpleObjectProperty<>(v.getValue().sinais));
+        sinais.setCellFactory(c -> new TableCell<>() {
+            @Override
+            protected void updateItem(Integer item, boolean vazio) {
+                super.updateItem(item, vazio);
+                setText(vazio || item == null ? null : item == 0 ? "–" : String.valueOf(item));
+                setAlignment(Pos.CENTER);
+                setStyle(!vazio && item != null && item > 0 ? "-fx-text-fill: -color-warning-fg; -fx-font-weight: bold;" : "");
+            }
+        });
+        tabela.getColumns().addAll(java.util.List.of(nome, cnpj, total, vezes, sinais));
     }
 
     @Override
@@ -105,14 +134,101 @@ public class AbaEmpresas implements Aba {
 
     @Override
     public void atualizar() {
-        Fornecedor selecionado = tabela.getSelectionModel().getSelectedItem();
-        tabela.setItems(FXCollections.observableArrayList(app.getPainel().ranking()));
+        Fornecedor selecionado = tabela.getSelectionModel().getSelectedItem() == null
+                ? null : tabela.getSelectionModel().getSelectedItem().fornecedor;
+        recarregarLinhas();
         if (selecionado != null) {
-            for (Fornecedor f : tabela.getItems()) {
-                if (f.getCnpj().equals(selecionado.getCnpj())) {
-                    tabela.getSelectionModel().select(f);
+            for (Linha l : tabela.getItems()) {
+                if (l.fornecedor.getCnpj().equals(selecionado.getCnpj())) {
+                    tabela.getSelectionModel().select(l);
                 }
             }
+        }
+    }
+
+    /** Refaz a tabela; a coluna Sinais usa a ficha em cache quando ela existe. */
+    private void recarregarLinhas() {
+        ArrayList<Linha> linhas = new ArrayList<>();
+        SinaisDaEmpresa regras = new SinaisDaEmpresa();
+        for (Fornecedor f : app.getPainel().ranking()) {
+            linhas.add(new Linha(f, regras.avaliar(f, fichaEmCache(f)).size()));
+        }
+        tabela.setItems(FXCollections.observableArrayList(linhas));
+        int semFicha = 0;
+        for (Linha l : linhas) {
+            if (Cnpj.valido(l.fornecedor.getCnpj()) && fichaEmCache(l.fornecedor) == null) {
+                semFicha++;
+            }
+        }
+        consultarTodas.setText("Consultar todas (" + semFicha + ")");
+        consultarTodas.setDisable(semFicha == 0);
+    }
+
+    private Empresa fichaEmCache(Fornecedor f) {
+        try {
+            return servico.doCache(f.getCnpj()).orElse(null);
+        } catch (SQLException e) {
+            return null;
+        }
+    }
+
+    /** Consulta uma por vez (o cliente ja espera 1 s entre chamadas) e mostra o andamento. */
+    private void consultarTodasAsEmpresas() {
+        ArrayList<Fornecedor> alvo = new ArrayList<>();
+        for (Linha l : tabela.getItems()) {
+            if (Cnpj.valido(l.fornecedor.getCnpj()) && fichaEmCache(l.fornecedor) == null) {
+                alvo.add(l.fornecedor);
+            }
+        }
+        consultarTodas.setDisable(true);
+        progresso.setVisible(true);
+        Task<Integer> tarefa = new Task<>() {
+            @Override
+            protected Integer call() {
+                int falhas = 0;
+                for (int i = 0; i < alvo.size(); i++) {
+                    updateMessage("consultando " + (i + 1) + " de " + alvo.size() + "…");
+                    updateProgress(i, alvo.size());
+                    try {
+                        servico.buscar(alvo.get(i).getCnpj());
+                    } catch (Exception e) {
+                        falhas++;
+                    }
+                }
+                updateProgress(alvo.size(), alvo.size());
+                return falhas;
+            }
+        };
+        progresso.progressProperty().bind(tarefa.progressProperty());
+        andamento.textProperty().bind(tarefa.messageProperty());
+        tarefa.setOnSucceeded(e -> {
+            progresso.progressProperty().unbind();
+            andamento.textProperty().unbind();
+            progresso.setVisible(false);
+            andamento.setText(tarefa.getValue() == 0 ? "concluído"
+                    : "concluído, " + tarefa.getValue() + " não consultada(s) (ver a ficha de cada uma)");
+            atualizar();
+        });
+        tarefa.setOnFailed(e -> {
+            progresso.progressProperty().unbind();
+            andamento.textProperty().unbind();
+            progresso.setVisible(false);
+            andamento.setText("erro: " + tarefa.getException().getMessage());
+            atualizar();
+        });
+        Thread t = new Thread(tarefa, "consulta-todas");
+        t.setDaemon(true);
+        t.start();
+    }
+
+    /** Uma linha da tabela: o fornecedor e quantos sinais de atencao ele tem hoje. */
+    private static final class Linha {
+        final Fornecedor fornecedor;
+        final int sinais;
+
+        Linha(Fornecedor fornecedor, int sinais) {
+            this.fornecedor = fornecedor;
+            this.sinais = sinais;
         }
     }
 
@@ -185,6 +301,11 @@ public class AbaEmpresas implements Aba {
         ficha.getChildren().add(nota);
     }
 
+    private boolean selecionado(Fornecedor f) {
+        Linha l = tabela.getSelectionModel().getSelectedItem();
+        return l != null && l.fornecedor == f;
+    }
+
     private Node botaoConsultar(Fornecedor f) {
         Button b = new Button(Cnpj.valido(f.getCnpj()) ? "Consultar na Receita (BrasilAPI)"
                 : "CNPJ inválido — não consultado");
@@ -204,12 +325,13 @@ public class AbaEmpresas implements Aba {
             }
         };
         tarefa.setOnSucceeded(e -> {
-            if (f == tabela.getSelectionModel().getSelectedItem()) {
+            if (selecionado(f)) {
                 desenhar(f, tarefa.getValue(), "");
             }
+            atualizar();
         });
         tarefa.setOnFailed(e -> {
-            if (f == tabela.getSelectionModel().getSelectedItem()) {
+            if (selecionado(f)) {
                 desenhar(f, null, "Não foi possível consultar: " + tarefa.getException().getMessage());
             }
         });

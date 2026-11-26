@@ -6,5 +6,5 @@ if not exist "_sistema\java\bin\java.exe" (
   pause
   exit /b 1
 )
-"_sistema\java\bin\java.exe" -Dfile.encoding=UTF-8 -Dstdout.encoding=UTF-8 --add-modules javafx.controls -cp "_sistema\diarios.jar;_sistema\lib\sqlite-jdbc.jar" diarios.desktop.Abrir %*
+"_sistema\java\bin\java.exe" -Dfile.encoding=UTF-8 -Dstdout.encoding=UTF-8 --add-modules javafx.controls -cp "_sistema\diarios.jar;_sistema\lib\*" diarios.desktop.Abrir %*
 pause

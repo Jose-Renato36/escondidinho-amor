@@ -2,7 +2,7 @@ PROJETO DIARIOS OFICIAIS
 ========================
 
 PARA USAR
-  Dois cliques em  ABRIR_JANELA.bat   (janela desktop, JavaFX)
+  Dois cliques em  ABRIR_JANELA.bat   (janela desktop, JavaFX, com modo escuro)
   ou em             ABRIR_PAINEL.bat   (painel no navegador, http://localhost:8080)
   Para parar, feche a janela preta.
 
@@ -14,7 +14,7 @@ O QUE TEM AQUI
   codigo\            o codigo-fonte para ler, mais os guias de estudo (.md)
   dados\             os diarios coletados
   _sistema\          Java e programa compilado. NAO MEXER.
-                     (dentro: RODAR_TESTES.bat, para ver os testes)
+                     (dentro: RODAR_TESTES.bat, para rodar todos os testes)
 
 SE O WINDOWS AVISAR "protegeu o computador":
   Mais informacoes -> Executar assim mesmo.

@@ -34,10 +34,12 @@ jlink \
   --output "$PACOTE/_sistema/java"
 
 echo "3/5 compilando os jars do projeto"
-(cd "$AQUI" && mvn -q package -DskipTests && mvn -q dependency:copy -Dartifact=org.xerial:sqlite-jdbc:3.46.1.3 \
-   -DoutputDirectory="$PACOTE/_sistema/lib" -Dmdep.stripVersion=true \
+mkdir -p "$PACOTE/_sistema/lib" "$PACOTE/_sistema/tools"
+(cd "$AQUI" && mvn -q package -DskipTests \
+ && mvn -q dependency:copy-dependencies -DincludeScope=runtime -DexcludeGroupIds=org.openjfx \
+    -DoutputDirectory="$PACOTE/_sistema/lib" \
  && mvn -q dependency:copy -Dartifact=org.junit.platform:junit-platform-console-standalone:1.11.3 \
-   -DoutputDirectory="$PACOTE/_sistema/lib" -Dmdep.stripVersion=true)
+    -DoutputDirectory="$PACOTE/_sistema/tools" -Dmdep.stripVersion=true)
 cp "$AQUI"/target/diarios-oficiais-*.jar "$PACOTE/_sistema/diarios.jar"
 (cd "$AQUI/target/test-classes" && jar cf "$PACOTE/_sistema/testes.jar" .)
 

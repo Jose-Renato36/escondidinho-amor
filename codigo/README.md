@@ -1,8 +1,14 @@
 # Diários Oficiais municipais — coleta, leitura e análise
 
-O núcleo (coleta, leitura, análise e painel web) é Java puro, só com o JDK 17+.
-A **janela desktop** usa duas bibliotecas: **JavaFX** (interface) e **SQLite JDBC**
-(banco de dados embutido). O Maven baixa as duas sozinho.
+O núcleo (coleta, leitura e análise) usa só o JDK 17+. Bibliotecas, todas baixadas pelo Maven:
+
+| biblioteca | para quê |
+|---|---|
+| **JavaFX** | a janela desktop |
+| **AtlantaFX** | temas claro/escuro da janela |
+| **SQLite JDBC** | banco de dados embutido (um arquivo `.db`) |
+| **Jackson** | ler o JSON das APIs |
+| **JUnit 5** | testes (só no teste) |
 
 O programa sobe um **painel no navegador**, coleta diários oficiais de
 municípios brasileiros, separa cada diário em atos individuais, lê o que cada
@@ -38,7 +44,7 @@ O navegador abre sozinho em `http://localhost:8080` e a coleta de 1 dia para
 trás começa em segundo plano. Para parar: o botão vermelho ■.
 
 Para rodar os testes: `mvn test`, ou abra `src/test/java/diarios/Testes.java` e aperte ▶
-(são testes **JUnit 5**: 14 métodos com 96 verificações, sobre os diários reais). Para o menu de terminal: `src/main/java/diarios/Principal.java`.
+(são testes **JUnit 5**: 29, sobre os diários reais, mais um servidor HTTP local que imita a BrasilAPI). Para o menu de terminal: `src/main/java/diarios/Principal.java`.
 
 > Se o IntelliJ marcar o código todo em vermelho, clique com o botão direito
 > no `pom.xml` → **Maven → Reload Project**.
@@ -135,6 +141,7 @@ Cuidados que estão no código:
 | **Gráficos** | decisão do portão, valor por município, maiores fornecedores | **consultas SQL** no banco |
 | **Atos** | tabela com filtro (texto, decisão, município) e o detalhe de cada ato | `Aplicacao` |
 | **Contratos** | tabela ordenável + botão **Exportar CSV** | `Aplicacao` |
+| **Empresas** | ficha da empresa (Receita Federal, via BrasilAPI), coluna de **sinais de atenção** e botão *Consultar todas* | `empresas/` + cache no banco |
 | **Normas** | o grafo de normas em tabela, filtrável por ação | `Aplicacao` |
 | **Coleta e fontes** | coletar, descobrir, ligar/desligar fontes, histórico | `Aplicacao` |
 
@@ -145,6 +152,21 @@ telas mostram sempre os mesmos números, porque a lógica não foi duplicada.
 em `dados/saida/diarios.db` (SQLite) numa transação: `atos`, `contratos` e `relacoes`.
 Os gráficos usam `GROUP BY`/`SUM`/`COUNT` em vez de laços. O arquivo de texto continua
 sendo a fonte da verdade; o banco é uma cópia para consulta e pode ser apagado.
+
+**Empresas (`empresas/`).** `Cnpj` confere os dois dígitos verificadores (sem rede). `ClienteBrasilApi`
+consulta `brasilapi.com.br/api/cnpj/v1/{cnpj}` (dado público da Receita) com `User-Agent`, 1 s entre
+consultas e tratamento de 404/429/5xx. `ServicoEmpresas` usa o **cache do banco** antes de ir à rede:
+a segunda consulta da mesma empresa não usa internet, e reprocessar os diários não apaga o cache.
+A consulta só acontece quando o usuário clica; se a API falhar, a janela mostra o motivo e segue funcionando.
+
+**Sinais de atenção (`analise/SinaisDaEmpresa`).** Regras, sem IA: CNPJ com dígito verificador inválido,
+situação cadastral que não é ativa, empresa aberta há menos de 12 meses, valor contratado 10 vezes
+acima do capital social, e três ou mais contratos. Cada sinal diz **o que isso não prova**: é um lugar
+onde vale olhar, nunca uma acusação.
+
+> Caso real: no diário de Belo Horizonte de 25/03/2026 a mesma associação aparece com os CNPJs
+> `10.987.990/0001-66` e `10.897.990/0001-66`. Só o segundo passa na conferência: o primeiro é troca
+> de dígitos no próprio Diário Oficial.
 
 **CSV (`persistencia/ExportadorCsv.java`).** Separador `;` e UTF-8 com BOM, que é o que
 o Excel em português espera. Campos com `;` ou aspas são protegidos.
