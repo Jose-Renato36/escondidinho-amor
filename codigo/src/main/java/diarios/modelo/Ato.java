@@ -4,10 +4,6 @@ import java.util.ArrayList;
 
 public class Ato {
 
-    public static final String ACEITO = "ACEITO";
-    public static final String DUVIDOSO = "DUVIDOSO";
-    public static final String REJEITADO = "REJEITADO";
-
     private final String municipio;
     private final String dataDiario;
     private final String especie;
@@ -18,7 +14,7 @@ public class Ato {
 
     private final ArrayList<Fato> fatos = new ArrayList<>();
 
-    private String decisao = DUVIDOSO;
+    private Decisao decisao = Decisao.DUVIDOSO;
     private String motivo = "ainda nao avaliado";
     private String desambiguador = "";
 
@@ -51,17 +47,17 @@ public class Ato {
         return fatos;
     }
 
-    public ArrayList<Fato> getFatosDoTipo(String tipo) {
+    public ArrayList<Fato> getFatosDoTipo(TipoFato tipo) {
         ArrayList<Fato> achados = new ArrayList<>();
         for (Fato f : fatos) {
-            if (f.getTipo().equals(tipo)) {
+            if (f.getTipo() == tipo) {
                 achados.add(f);
             }
         }
         return achados;
     }
 
-    public void decidir(String decisao, String motivo) {
+    public void decidir(Decisao decisao, String motivo) {
         this.decisao = decisao;
         this.motivo = motivo;
     }
@@ -72,7 +68,7 @@ public class Ato {
     public String getNumero()     { return numero; }
     public String getTitulo()     { return titulo; }
     public String getTexto()      { return texto; }
-    public String getDecisao()    { return decisao; }
+    public Decisao getDecisao()   { return decisao; }
     public String getMotivo()     { return motivo; }
     public int getPosicao()       { return posicaoNoDiario; }
 

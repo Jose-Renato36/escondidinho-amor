@@ -5,9 +5,11 @@ import diarios.coleta.Rodada;
 import diarios.etapas.PaginaHtml;
 import diarios.etapas.Relatorio;
 import diarios.etapas.Visualizador;
+import diarios.modelo.Acao;
 import diarios.modelo.Achado;
 import diarios.modelo.Ato;
 import diarios.modelo.Contrato;
+import diarios.modelo.Decisao;
 import diarios.modelo.Diario;
 import diarios.modelo.Fato;
 import diarios.modelo.Relacao;
@@ -160,8 +162,8 @@ public class Principal {
         for (Diario d : app.getDiarios()) {
             if (d.isUtilizavel()) {
                 System.out.println("  " + d.getArquivo() + " ... " + d.getAtos().size() + " atos  ("
-                        + d.contar(Ato.ACEITO) + " aceitos, " + d.contar(Ato.DUVIDOSO)
-                        + " duvidosos, " + d.contar(Ato.REJEITADO) + " rejeitados)");
+                        + d.contar(Decisao.ACEITO) + " aceitos, " + d.contar(Decisao.DUVIDOSO)
+                        + " duvidosos, " + d.contar(Decisao.REJEITADO) + " rejeitados)");
             } else {
                 System.out.println("  " + d.getArquivo() + " ... RECUSADO ("
                         + d.getMotivoRecusa() + ")");
@@ -291,10 +293,10 @@ public class Principal {
         System.out.println("===============");
         System.out.println();
         System.out.println("  relacoes : " + app.getGrafo().getArestas().size());
-        System.out.println("     ALTERA   : " + app.getGrafo().doTipo(Relacao.ALTERA).size());
-        System.out.println("     REVOGA   : " + app.getGrafo().doTipo(Relacao.REVOGA).size());
-        System.out.println("     PRORROGA : " + app.getGrafo().doTipo(Relacao.PRORROGA).size());
-        System.out.println("     CITA     : " + app.getGrafo().doTipo(Relacao.CITA).size());
+        System.out.println("     ALTERA   : " + app.getGrafo().doTipo(Acao.ALTERA).size());
+        System.out.println("     REVOGA   : " + app.getGrafo().doTipo(Acao.REVOGA).size());
+        System.out.println("     PRORROGA : " + app.getGrafo().doTipo(Acao.PRORROGA).size());
+        System.out.println("     CITA     : " + app.getGrafo().doTipo(Acao.CITA).size());
 
         ArrayList<String[]> mexidas = app.getGrafo().maisAlteradas();
         if (!mexidas.isEmpty()) {
@@ -437,7 +439,7 @@ public class Principal {
         l.add("GRAFO DE NORMAS");
         l.add("origem;acao;alvo;posicao");
         for (Relacao r : app.getGrafo().getArestas()) {
-            l.add(String.join(";", r.getOrigem(), r.getAcao(), r.getAlvo(),
+            l.add(String.join(";", r.getOrigem(), r.getAcao().name(), r.getAlvo(),
                     String.valueOf(r.getPosicao())));
         }
         l.add("");
@@ -455,7 +457,7 @@ public class Principal {
         l.add("identidade;especie;decisao;motivo;fatos;leitura;titulo");
         for (Diario d : app.getDiarios()) {
             for (Ato a : d.getAtos()) {
-                l.add(String.join(";", a.getIdentidade(), a.getEspecie(), a.getDecisao(),
+                l.add(String.join(";", a.getIdentidade(), a.getEspecie(), a.getDecisao().name(),
                         a.getMotivo().replace(';', ','), String.valueOf(a.getFatos().size()),
                         app.leitor().ler(a, d.getData()).replace(';', ','),
                         a.getTitulo().replace(';', ',')));

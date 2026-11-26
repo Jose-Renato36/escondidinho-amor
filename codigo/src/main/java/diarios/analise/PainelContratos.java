@@ -5,6 +5,7 @@ import diarios.modelo.Ato;
 import diarios.modelo.Contrato;
 import diarios.modelo.Diario;
 import diarios.modelo.Fato;
+import diarios.modelo.TipoFato;
 import java.util.ArrayList;
 
 public class PainelContratos {
@@ -59,12 +60,12 @@ public class PainelContratos {
                 continue;
             }
             for (Ato ato : d.getAtos()) {
-                ArrayList<Fato> cnpjs = ato.getFatosDoTipo(Fato.CNPJ);
-                ArrayList<Fato> valores = ato.getFatosDoTipo(Fato.VALOR);
+                ArrayList<Fato> cnpjs = ato.getFatosDoTipo(TipoFato.CNPJ);
+                ArrayList<Fato> valores = ato.getFatosDoTipo(TipoFato.VALOR);
                 if (cnpjs.isEmpty() || valores.isEmpty()) {
                     continue;
                 }
-                ArrayList<Fato> processos = ato.getFatosDoTipo(Fato.PROCESSO);
+                ArrayList<Fato> processos = ato.getFatosDoTipo(TipoFato.PROCESSO);
                 String processo = processos.isEmpty() ? "-" : processos.get(0).getValor();
 
                 for (Fato cnpj : cnpjs) {

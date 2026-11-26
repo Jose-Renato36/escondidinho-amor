@@ -3,6 +3,7 @@ package diarios.analise;
 import diarios.extratores.Extrator;
 import diarios.modelo.Ato;
 import diarios.modelo.Fato;
+import diarios.modelo.TipoFato;
 
 public class Assunto {
 
@@ -37,8 +38,8 @@ public class Assunto {
         String texto = Extrator.semAcento(ato.getTexto().toLowerCase());
         String especie = ato.getEspecie();
 
-        boolean temDinheiro = !ato.getFatosDoTipo(Fato.VALOR).isEmpty();
-        boolean temEmpresa = !ato.getFatosDoTipo(Fato.CNPJ).isEmpty();
+        boolean temDinheiro = !ato.getFatosDoTipo(TipoFato.VALOR).isEmpty();
+        boolean temEmpresa = !ato.getFatosDoTipo(TipoFato.CNPJ).isEmpty();
 
         if (temEmpresa && temDinheiro) {
             return CONTRATACAO;

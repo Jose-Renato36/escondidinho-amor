@@ -1,6 +1,7 @@
 package diarios.extratores;
 
 import diarios.modelo.Fato;
+import diarios.modelo.TipoFato;
 import java.util.ArrayList;
 
 public class ExtratorCnpj extends Extrator {
@@ -8,7 +9,7 @@ public class ExtratorCnpj extends Extrator {
     private static final String MOLDE = "99.999.999/9999-99";
 
     public ExtratorCnpj() {
-        super(Fato.CNPJ);
+        super(TipoFato.CNPJ);
     }
 
     @Override

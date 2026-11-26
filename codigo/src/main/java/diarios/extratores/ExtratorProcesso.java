@@ -1,6 +1,7 @@
 package diarios.extratores;
 
 import diarios.modelo.Fato;
+import diarios.modelo.TipoFato;
 import java.util.ArrayList;
 
 public class ExtratorProcesso extends Extrator {
@@ -9,7 +10,7 @@ public class ExtratorProcesso extends Extrator {
     private static final int TAMANHO_MINIMO = 6;
 
     public ExtratorProcesso() {
-        super(Fato.PROCESSO);
+        super(TipoFato.PROCESSO);
     }
 
     @Override

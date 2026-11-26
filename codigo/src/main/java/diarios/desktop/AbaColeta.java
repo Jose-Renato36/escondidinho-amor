@@ -102,21 +102,13 @@ public class AbaColeta implements Aba {
 
     private void montarTabelaDeFontes() {
         fontes.getColumns().addAll(java.util.List.of(
-                coluna("Ligada", 70, f -> f.isLigada() ? "sim" : "não"),
-                coluna("Município", 160, f -> f.getMunicipio().getNome()),
-                coluna("UF", 50, f -> f.getMunicipio().getUf()),
-                coluna("Status", 130, EstadoFonte::getStatus),
-                coluna("Última tentativa", 150, EstadoFonte::getUltimaTentativa),
-                coluna("No acervo", 80, f -> String.valueOf(f.getDiariosNoAcervo())),
-                coluna("Motivo", 380, EstadoFonte::getMotivo)));
-    }
-
-    private static TableColumn<EstadoFonte, String> coluna(String nome, double largura,
-            java.util.function.Function<EstadoFonte, String> leitor) {
-        TableColumn<EstadoFonte, String> c = new TableColumn<>(nome);
-        c.setPrefWidth(largura);
-        c.setCellValueFactory(v -> new javafx.beans.property.SimpleStringProperty(leitor.apply(v.getValue())));
-        return c;
+                Tabelas.<EstadoFonte>texto("Ligada", 70, f -> f.isLigada() ? "sim" : "não"),
+                Tabelas.<EstadoFonte>texto("Município", 160, f -> f.getMunicipio().getNome()),
+                Tabelas.<EstadoFonte>texto("UF", 50, f -> f.getMunicipio().getUf()),
+                Tabelas.texto("Status", 130, EstadoFonte::getStatus),
+                Tabelas.texto("Última tentativa", 150, EstadoFonte::getUltimaTentativa),
+                Tabelas.<EstadoFonte>texto("No acervo", 80, f -> String.valueOf(f.getDiariosNoAcervo())),
+                Tabelas.texto("Motivo", 380, EstadoFonte::getMotivo)));
     }
 
     private void verificar() {

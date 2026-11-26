@@ -1,10 +1,13 @@
 package diarios.analise;
 
 import diarios.extratores.Extrator;
+import diarios.modelo.Acao;
 import diarios.modelo.Ato;
 import diarios.modelo.Contrato;
+import diarios.modelo.Decisao;
 import diarios.modelo.Fato;
 import diarios.modelo.Relacao;
+import diarios.modelo.TipoFato;
 import java.util.ArrayList;
 
 public class LeituraDoAto {
@@ -56,7 +59,7 @@ public class LeituraDoAto {
                 || texto.contains("entra em vigor na data da sua publicacao")) {
             s.append(" Vigora desde a publicacao (").append(dataDoDiario).append(").");
         }
-        if (ato.getDecisao().equals(Ato.DUVIDOSO)) {
+        if (ato.getDecisao() == Decisao.DUVIDOSO) {
             s.append(" Leitura com ressalva: ").append(ato.getMotivo()).append(".");
         }
         return s.toString();
@@ -111,10 +114,10 @@ public class LeituraDoAto {
             if (!r.getOrigem().equals(ato.getIdentidade())) {
                 continue;
             }
-            if (r.getAcao().equals(Relacao.CITA)) {
+            if (r.getAcao() == Acao.CITA) {
                 citacoes++;
             } else {
-                String frase = r.getAcao().toLowerCase() + " " + r.getAlvo();
+                String frase = r.getAcao().name().toLowerCase() + " " + r.getAlvo();
                 if (!acoes.contains(frase)) {
                     acoes.add(frase);
                 }
@@ -128,7 +131,7 @@ public class LeituraDoAto {
     }
 
     private String lerOrcamento(Ato ato) {
-        ArrayList<Fato> valores = ato.getFatosDoTipo(Fato.VALOR);
+        ArrayList<Fato> valores = ato.getFatosDoTipo(TipoFato.VALOR);
         if (valores.isEmpty()) {
             return "Ato orcamentario (credito ou dotacao), sem valor identificado.";
         }

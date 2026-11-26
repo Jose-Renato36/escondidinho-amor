@@ -1,8 +1,10 @@
 package diarios.etapas;
 
 import diarios.modelo.Ato;
+import diarios.modelo.Decisao;
 import diarios.modelo.Diario;
 import diarios.modelo.Fato;
+import diarios.modelo.TipoFato;
 
 public class Portao {
 
@@ -18,32 +20,32 @@ public class Portao {
     private void avaliarAto(Ato ato) {
         int tamanho = ato.getTexto().trim().length();
         if (tamanho < TEXTO_MINIMO) {
-            ato.decidir(Ato.REJEITADO, "texto curto demais (" + tamanho
+            ato.decidir(Decisao.REJEITADO, "texto curto demais (" + tamanho
                     + " caracteres, minimo " + TEXTO_MINIMO + ")");
             return;
         }
         if (ato.getEspecie().isEmpty()) {
-            ato.decidir(Ato.REJEITADO, "sem especie identificada");
+            ato.decidir(Decisao.REJEITADO, "sem especie identificada");
             return;
         }
 
-        int datas = ato.getFatosDoTipo(Fato.DATA).size();
+        int datas = ato.getFatosDoTipo(TipoFato.DATA).size();
         int total = ato.getFatos().size();
         boolean temNumero = !ato.getNumero().isEmpty();
-        boolean temDinheiro = !ato.getFatosDoTipo(Fato.VALOR).isEmpty()
-                || !ato.getFatosDoTipo(Fato.CNPJ).isEmpty();
-        boolean temNorma = !ato.getFatosDoTipo(Fato.REFERENCIA).isEmpty();
+        boolean temDinheiro = !ato.getFatosDoTipo(TipoFato.VALOR).isEmpty()
+                || !ato.getFatosDoTipo(TipoFato.CNPJ).isEmpty();
+        boolean temNorma = !ato.getFatosDoTipo(TipoFato.REFERENCIA).isEmpty();
 
         if (total < FATOS_MINIMOS) {
-            ato.decidir(Ato.DUVIDOSO, "poucos fatos extraidos (" + total + ")");
+            ato.decidir(Decisao.DUVIDOSO, "poucos fatos extraidos (" + total + ")");
             return;
         }
         if (!temNumero && !temDinheiro && !temNorma) {
-            ato.decidir(Ato.DUVIDOSO, "sem numero, sem valor/CNPJ e sem norma citada");
+            ato.decidir(Decisao.DUVIDOSO, "sem numero, sem valor/CNPJ e sem norma citada");
             return;
         }
         if (datas == 0) {
-            ato.decidir(Ato.DUVIDOSO, "nenhuma data encontrada no ato");
+            ato.decidir(Decisao.DUVIDOSO, "nenhuma data encontrada no ato");
             return;
         }
 
@@ -58,6 +60,6 @@ public class Portao {
             porque.append("norma citada, ");
         }
         porque.append(datas).append(" data(s), ").append(total).append(" fatos");
-        ato.decidir(Ato.ACEITO, porque.toString());
+        ato.decidir(Decisao.ACEITO, porque.toString());
     }
 }

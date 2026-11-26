@@ -9,6 +9,7 @@ import diarios.coleta.Rodada;
 import diarios.etapas.PaginaHtml;
 import diarios.modelo.Ato;
 import diarios.modelo.Contrato;
+import diarios.modelo.Decisao;
 import diarios.modelo.Diario;
 import java.util.ArrayList;
 
@@ -280,7 +281,7 @@ public class PainelWeb {
                     recusados++;
                 }
                 atos += d.getAtos().size();
-                aceitos += d.contar(Ato.ACEITO);
+                aceitos += d.contar(Decisao.ACEITO);
             }
             int contratos = 0;
             double valor = 0;
@@ -319,8 +320,8 @@ public class PainelWeb {
             }
             h.add("<tr><td>" + link + "</td><td><span class=\"tag tag-ok\">PROCESSADO</span></td>"
                     + "<td class=\"num\">" + d.getAtos().size() + "</td>"
-                    + "<td class=\"num\">" + d.contar(Ato.ACEITO) + "</td>"
-                    + "<td class=\"num\">" + d.contar(Ato.DUVIDOSO) + "</td>"
+                    + "<td class=\"num\">" + d.contar(Decisao.ACEITO) + "</td>"
+                    + "<td class=\"num\">" + d.contar(Decisao.DUVIDOSO) + "</td>"
                     + "<td class=\"num\">" + d.getLinhasRemovidas() + "</td></tr>");
         }
         h.add("</tbody></table>");

@@ -40,24 +40,16 @@ public class AbaContratos implements Aba {
         barra.setAlignment(javafx.geometry.Pos.CENTER_LEFT);
 
         tabela.getColumns().addAll(java.util.List.of(
-                texto("Município", 110, Contrato::getMunicipio),
-                texto("Data", 90, Contrato::getData),
-                texto("Contratada", 260, Contrato::getContratada),
-                texto("CNPJ", 140, Contrato::getCnpj),
-                texto("Papel", 110, Contrato::getPapel),
+                Tabelas.texto("Município", 110, Contrato::getMunicipio),
+                Tabelas.texto("Data", 90, Contrato::getData),
+                Tabelas.texto("Contratada", 260, Contrato::getContratada),
+                Tabelas.texto("CNPJ", 140, Contrato::getCnpj),
+                Tabelas.texto("Papel", 110, Contrato::getPapel),
                 valor(),
-                texto("Processo", 140, Contrato::getProcesso),
-                texto("Ato", 240, Contrato::getIdentidadeAto)));
+                Tabelas.texto("Processo", 140, Contrato::getProcesso),
+                Tabelas.texto("Ato", 240, Contrato::getIdentidadeAto)));
         VBox.setVgrow(tabela, Priority.ALWAYS);
         tab.setContent(new VBox(barra, tabela));
-    }
-
-    private static TableColumn<Contrato, String> texto(String nome, double largura,
-            java.util.function.Function<Contrato, String> leitor) {
-        TableColumn<Contrato, String> c = new TableColumn<>(nome);
-        c.setPrefWidth(largura);
-        c.setCellValueFactory(v -> new javafx.beans.property.SimpleStringProperty(leitor.apply(v.getValue())));
-        return c;
     }
 
     /** Coluna numerica: ordena pelo numero, mas mostra formatado em reais. */

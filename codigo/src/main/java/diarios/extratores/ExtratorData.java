@@ -1,6 +1,7 @@
 package diarios.extratores;
 
 import diarios.modelo.Fato;
+import diarios.modelo.TipoFato;
 import java.util.ArrayList;
 
 public class ExtratorData extends Extrator {
@@ -11,7 +12,7 @@ public class ExtratorData extends Extrator {
     };
 
     public ExtratorData() {
-        super(Fato.DATA);
+        super(TipoFato.DATA);
     }
 
     @Override

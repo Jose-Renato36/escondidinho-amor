@@ -2,6 +2,7 @@ package diarios.desktop;
 
 import diarios.Aplicacao;
 import diarios.modelo.Ato;
+import diarios.modelo.Decisao;
 import diarios.modelo.Diario;
 import diarios.modelo.Fato;
 import java.util.ArrayList;
@@ -45,7 +46,8 @@ public class AbaAtos implements Aba {
 
         busca.setPromptText("filtrar por palavra no título ou no texto");
         HBox.setHgrow(busca, Priority.ALWAYS);
-        decisao.setItems(FXCollections.observableArrayList(TODOS, Ato.ACEITO, Ato.DUVIDOSO, Ato.REJEITADO));
+        decisao.setItems(FXCollections.observableArrayList(TODOS, Decisao.ACEITO.name(), Decisao.DUVIDOSO.name(),
+                Decisao.REJEITADO.name()));
         decisao.setValue(TODOS);
         municipio.setValue(TODOS);
         busca.textProperty().addListener((o, a, b) -> aplicarFiltro());
@@ -73,29 +75,21 @@ public class AbaAtos implements Aba {
     }
 
     private void montarColunas() {
-        TableColumn<Ato, String> cMun = coluna("Município", 120, Ato::getMunicipio);
-        TableColumn<Ato, String> cData = coluna("Data", 90, Ato::getDataDiario);
-        TableColumn<Ato, String> cEsp = coluna("Espécie", 120, Ato::getEspecie);
-        TableColumn<Ato, String> cNum = coluna("Nº", 70, Ato::getNumero);
-        TableColumn<Ato, String> cDec = coluna("Decisão", 100, Ato::getDecisao);
+        TableColumn<Ato, String> cMun = Tabelas.texto("Município", 120, Ato::getMunicipio);
+        TableColumn<Ato, String> cData = Tabelas.texto("Data", 90, Ato::getDataDiario);
+        TableColumn<Ato, String> cEsp = Tabelas.texto("Espécie", 120, Ato::getEspecie);
+        TableColumn<Ato, String> cNum = Tabelas.texto("Nº", 70, Ato::getNumero);
+        TableColumn<Ato, String> cDec = Tabelas.<Ato>texto("Decisão", 100, a -> a.getDecisao().name());
         cDec.setCellFactory(c -> new TableCell<>() {
             @Override
             protected void updateItem(String item, boolean vazio) {
                 super.updateItem(item, vazio);
                 setText(vazio ? null : item);
-                setStyle(vazio ? "" : "-fx-text-fill: " + Estilo.corDaDecisao(item) + "; -fx-font-weight: bold;");
+                setStyle(vazio ? "" : "-fx-text-fill: " + Estilo.corDaDecisao(Decisao.valueOf(item)) + "; -fx-font-weight: bold;");
             }
         });
-        TableColumn<Ato, String> cTit = coluna("Título", 520, a -> Estilo.cortar(a.getTitulo(), 140));
+        TableColumn<Ato, String> cTit = Tabelas.<Ato>texto("Título", 520, a -> Estilo.cortar(a.getTitulo(), 140));
         tabela.getColumns().addAll(java.util.List.of(cMun, cData, cEsp, cNum, cDec, cTit));
-    }
-
-    private static TableColumn<Ato, String> coluna(String nome, double largura,
-                                                   java.util.function.Function<Ato, String> leitor) {
-        TableColumn<Ato, String> c = new TableColumn<>(nome);
-        c.setPrefWidth(largura);
-        c.setCellValueFactory(v -> new javafx.beans.property.SimpleStringProperty(leitor.apply(v.getValue())));
-        return c;
     }
 
     @Override
@@ -126,7 +120,7 @@ public class AbaAtos implements Aba {
         String dec = decisao.getValue();
         String mun = municipio.getValue();
         filtrados.setPredicate(a ->
-                (dec == null || TODOS.equals(dec) || dec.equals(a.getDecisao()))
+                (dec == null || TODOS.equals(dec) || dec.equals(a.getDecisao().name()))
                 && (mun == null || TODOS.equals(mun) || mun.equals(a.getMunicipio()))
                 && (palavra.isEmpty()
                     || a.getTitulo().toLowerCase().contains(palavra)

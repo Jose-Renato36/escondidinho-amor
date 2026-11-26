@@ -2,17 +2,12 @@ package diarios.modelo;
 
 public class Relacao {
 
-    public static final String ALTERA = "ALTERA";
-    public static final String REVOGA = "REVOGA";
-    public static final String PRORROGA = "PRORROGA";
-    public static final String CITA = "CITA";
-
     private final String origem;
-    private final String acao;
+    private final Acao acao;
     private final String alvo;
     private final int posicao;
 
-    public Relacao(String origem, String acao, String alvo, int posicao) {
+    public Relacao(String origem, Acao acao, String alvo, int posicao) {
         this.origem = origem;
         this.acao = acao;
         this.alvo = alvo;
@@ -20,7 +15,7 @@ public class Relacao {
     }
 
     public String getOrigem() { return origem; }
-    public String getAcao()   { return acao; }
+    public Acao getAcao()     { return acao; }
     public String getAlvo()   { return alvo; }
     public int getPosicao()   { return posicao; }
 

@@ -4,9 +4,11 @@ import diarios.analise.Cobertura;
 import diarios.analise.GrafoNormas;
 import diarios.analise.Interpretacao;
 import diarios.analise.PainelContratos;
+import diarios.modelo.Acao;
 import diarios.modelo.Achado;
 import diarios.modelo.Ato;
 import diarios.modelo.Contrato;
+import diarios.modelo.Decisao;
 import diarios.modelo.Diario;
 import diarios.modelo.Relacao;
 import java.io.IOException;
@@ -70,7 +72,7 @@ public class PaginaHtml {
         tile(h, String.valueOf(painel.getContratos().size()), "contratacoes",
                 Contrato.formatarReal(painel.total()) + " no total");
         tile(h, String.valueOf(grafo.getArestas().size()), "relacoes entre normas",
-                grafo.doTipo(Relacao.ALTERA).size() + " alteracoes reais");
+                grafo.doTipo(Acao.ALTERA).size() + " alteracoes reais");
         tile(h, String.valueOf(c.getRecusados()), "diario(s) recusado(s)",
                 "sem texto aproveitavel");
         h.add("</section>");
@@ -168,8 +170,8 @@ public class PaginaHtml {
         etapaFunil(h, "2. Fragmentacao", atos, d.getTitulosCandidatos(),
                 d.getTitulosCandidatos() + " titulos candidatos, " + d.getTitulosDescartados()
                 + " descartados por nao terem corpo de texto");
-        etapaFunil(h, "3. Portao", d.contar(Ato.ACEITO), atos,
-                d.contar(Ato.ACEITO) + " aceitos de " + atos + " atos");
+        etapaFunil(h, "3. Portao", d.contar(Decisao.ACEITO), atos,
+                d.contar(Decisao.ACEITO) + " aceitos de " + atos + " atos");
         h.add("</div>");
         h.add("</section>");
     }
@@ -284,10 +286,10 @@ public class PaginaHtml {
                 + "CITA.</p>");
 
         h.add("<div class=\"contagem\">");
-        contar(h, "ALTERA", grafo.doTipo(Relacao.ALTERA).size());
-        contar(h, "REVOGA", grafo.doTipo(Relacao.REVOGA).size());
-        contar(h, "PRORROGA", grafo.doTipo(Relacao.PRORROGA).size());
-        contar(h, "CITA", grafo.doTipo(Relacao.CITA).size());
+        contar(h, "ALTERA", grafo.doTipo(Acao.ALTERA).size());
+        contar(h, "REVOGA", grafo.doTipo(Acao.REVOGA).size());
+        contar(h, "PRORROGA", grafo.doTipo(Acao.PRORROGA).size());
+        contar(h, "CITA", grafo.doTipo(Acao.CITA).size());
         h.add("</div>");
 
         ArrayList<String[]> mexidas = grafo.maisAlteradas();
@@ -308,11 +310,11 @@ public class PaginaHtml {
                 + "</tr></thead><tbody>");
         int mostradas = 0;
         for (Relacao r : grafo.getArestas()) {
-            if (r.getAcao().equals(Relacao.CITA) || mostradas >= 10) {
+            if (r.getAcao() == Acao.CITA || mostradas >= 10) {
                 continue;
             }
             h.add("<tr><td class=\"mono\">" + escapar(r.getOrigem()) + "</td>"
-                    + "<td><span class=\"tag\">" + escapar(r.getAcao()) + "</span></td>"
+                    + "<td><span class=\"tag\">" + escapar(r.getAcao().name()) + "</span></td>"
                     + "<td class=\"mono\">" + escapar(r.getAlvo()) + "</td></tr>");
             mostradas++;
         }

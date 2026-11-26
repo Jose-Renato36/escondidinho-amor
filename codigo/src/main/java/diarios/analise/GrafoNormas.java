@@ -1,10 +1,12 @@
 package diarios.analise;
 
 import diarios.extratores.Extrator;
+import diarios.modelo.Acao;
 import diarios.modelo.Ato;
 import diarios.modelo.Diario;
 import diarios.modelo.Fato;
 import diarios.modelo.Relacao;
+import diarios.modelo.TipoFato;
 import java.util.ArrayList;
 
 public class GrafoNormas {
@@ -32,7 +34,7 @@ public class GrafoNormas {
                 continue;
             }
             for (Ato ato : d.getAtos()) {
-                for (Fato ref : ato.getFatosDoTipo(Fato.REFERENCIA)) {
+                for (Fato ref : ato.getFatosDoTipo(TipoFato.REFERENCIA)) {
                     Relacao nova = new Relacao(ato.getIdentidade(),
                             classificar(d.getTextoLimpo(), ref.getInicio(), ref.getFim()),
                             ref.getValor(), ref.getInicio());
@@ -44,34 +46,34 @@ public class GrafoNormas {
         }
     }
 
-    private String classificar(String texto, int inicioCitacao, int fimCitacao) {
+    private Acao classificar(String texto, int inicioCitacao, int fimCitacao) {
         String antes = trecho(texto, Math.max(0, inicioCitacao - JANELA_ANTES), inicioCitacao);
         String depois = trecho(texto, fimCitacao,
                 Math.min(texto.length(), fimCitacao + JANELA_DEPOIS));
 
         String comecoDepois = primeiros(depois, TRECHO_DEPOIS);
         if (comecoDepois.contains("fica revogad") || comecoDepois.contains("ficam revogad")) {
-            return Relacao.REVOGA;
+            return Acao.REVOGA;
         }
         if (comecoDepois.contains("passa a vigorar") || comecoDepois.contains("passam a vigorar")) {
-            return Relacao.ALTERA;
+            return Acao.ALTERA;
         }
 
         if (ehFundamento(antes)) {
-            return Relacao.CITA;
+            return Acao.CITA;
         }
 
         String fim = ultimos(antes, TRECHO_VERBO);
         if (operou(fim, "revogad", "revoga")) {
-            return Relacao.REVOGA;
+            return Acao.REVOGA;
         }
         if (operou(fim, "prorrogad", "prorroga")) {
-            return Relacao.PRORROGA;
+            return Acao.PRORROGA;
         }
         if (operou(fim, "alterad", "altera") || fim.contains("nova redacao")) {
-            return Relacao.ALTERA;
+            return Acao.ALTERA;
         }
-        return Relacao.CITA;
+        return Acao.CITA;
     }
 
     private boolean operou(String trecho, String participio, String verbo) {
@@ -105,10 +107,10 @@ public class GrafoNormas {
         return arestas;
     }
 
-    public ArrayList<Relacao> doTipo(String acao) {
+    public ArrayList<Relacao> doTipo(Acao acao) {
         ArrayList<Relacao> lista = new ArrayList<>();
         for (Relacao r : arestas) {
-            if (r.getAcao().equals(acao)) {
+            if (r.getAcao() == acao) {
                 lista.add(r);
             }
         }
@@ -120,7 +122,7 @@ public class GrafoNormas {
         ArrayList<Integer> contagem = new ArrayList<>();
 
         for (Relacao r : arestas) {
-            if (r.getAcao().equals(Relacao.CITA)) {
+            if (r.getAcao() == Acao.CITA) {
                 continue;
             }
             int i = alvos.indexOf(r.getAlvo());

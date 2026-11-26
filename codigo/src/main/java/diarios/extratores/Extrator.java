@@ -1,17 +1,18 @@
 package diarios.extratores;
 
 import diarios.modelo.Fato;
+import diarios.modelo.TipoFato;
 import java.util.ArrayList;
 
 public abstract class Extrator {
 
-    private final String tipo;
+    private final TipoFato tipo;
 
-    protected Extrator(String tipo) {
+    protected Extrator(TipoFato tipo) {
         this.tipo = tipo;
     }
 
-    public String getTipo() {
+    public TipoFato getTipo() {
         return tipo;
     }
 

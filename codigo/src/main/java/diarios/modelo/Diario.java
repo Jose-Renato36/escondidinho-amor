@@ -47,10 +47,10 @@ public class Diario {
         atos.add(a);
     }
 
-    public int contar(String decisao) {
+    public int contar(Decisao decisao) {
         int n = 0;
         for (Ato a : atos) {
-            if (a.getDecisao().equals(decisao)) {
+            if (a.getDecisao() == decisao) {
                 n++;
             }
         }

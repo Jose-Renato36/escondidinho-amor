@@ -84,7 +84,7 @@ public class Banco implements AutoCloseable {
                     ps.setString(4, a.getEspecie());
                     ps.setString(5, a.getNumero());
                     ps.setString(6, a.getTitulo());
-                    ps.setString(7, a.getDecisao());
+                    ps.setString(7, a.getDecisao().name());
                     ps.setString(8, a.getMotivo());
                     ps.setString(9, d.getArquivo());
                     ps.setString(10, a.getTexto());
@@ -119,7 +119,7 @@ public class Banco implements AutoCloseable {
         try (PreparedStatement ps = conexao.prepareStatement(sql)) {
             for (Relacao r : relacoes) {
                 ps.setString(1, r.getOrigem());
-                ps.setString(2, r.getAcao());
+                ps.setString(2, r.getAcao().name());
                 ps.setString(3, r.getAlvo());
                 ps.addBatch();
             }

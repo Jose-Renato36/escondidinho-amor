@@ -1,6 +1,7 @@
 package diarios.desktop;
 
 import diarios.modelo.Ato;
+import diarios.modelo.Decisao;
 import javafx.geometry.Insets;
 import javafx.scene.control.Label;
 import javafx.scene.layout.VBox;
@@ -30,14 +31,12 @@ final class Estilo {
     private Estilo() {
     }
 
-    static String corDaDecisao(String decisao) {
-        if (Ato.ACEITO.equals(decisao)) {
-            return VERDE;
-        }
-        if (Ato.DUVIDOSO.equals(decisao)) {
-            return AMARELO;
-        }
-        return VERMELHO;
+    static String corDaDecisao(Decisao decisao) {
+        return switch (decisao) {
+            case ACEITO -> VERDE;
+            case DUVIDOSO -> AMARELO;
+            case REJEITADO -> VERMELHO;
+        };
     }
 
     static VBox tile(String numero, String nome) {

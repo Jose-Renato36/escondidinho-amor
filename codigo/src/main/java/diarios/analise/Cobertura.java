@@ -1,6 +1,7 @@
 package diarios.analise;
 
 import diarios.modelo.Ato;
+import diarios.modelo.Decisao;
 import diarios.modelo.Diario;
 import java.util.ArrayList;
 
@@ -35,9 +36,9 @@ public class Cobertura {
         lidos++;
         utilizaveis++;
         totalAtos += d.getAtos().size();
-        aceitos += d.contar(Ato.ACEITO);
-        duvidosos += d.contar(Ato.DUVIDOSO);
-        rejeitados += d.contar(Ato.REJEITADO);
+        aceitos += d.contar(Decisao.ACEITO);
+        duvidosos += d.contar(Decisao.DUVIDOSO);
+        rejeitados += d.contar(Decisao.REJEITADO);
 
         linhas.add("  " + d.getArquivo());
         linhas.add(String.format("     limpeza       : %d linhas -> %d removidas como lixo",
@@ -46,7 +47,7 @@ public class Cobertura {
                 + "(sem corpo), %d atos",
                 d.getTitulosCandidatos(), d.getTitulosDescartados(), d.getAtos().size()));
         linhas.add(String.format("     portao        : ACEITO %d - DUVIDOSO %d - REJEITADO %d",
-                d.contar(Ato.ACEITO), d.contar(Ato.DUVIDOSO), d.contar(Ato.REJEITADO)));
+                d.contar(Decisao.ACEITO), d.contar(Decisao.DUVIDOSO), d.contar(Decisao.REJEITADO)));
         linhas.add("");
     }
 

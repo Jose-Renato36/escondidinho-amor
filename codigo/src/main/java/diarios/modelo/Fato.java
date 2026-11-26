@@ -2,25 +2,19 @@ package diarios.modelo;
 
 public class Fato {
 
-    public static final String DATA = "DATA";
-    public static final String VALOR = "VALOR";
-    public static final String CNPJ = "CNPJ";
-    public static final String PROCESSO = "PROCESSO";
-    public static final String REFERENCIA = "REFERENCIA";
-
-    private final String tipo;
+    private final TipoFato tipo;
     private final String valor;
     private final int inicio;
     private final int fim;
 
-    public Fato(String tipo, String valor, int inicio, int fim) {
+    public Fato(TipoFato tipo, String valor, int inicio, int fim) {
         this.tipo = tipo;
         this.valor = valor;
         this.inicio = inicio;
         this.fim = fim;
     }
 
-    public String getTipo()  { return tipo; }
+    public TipoFato getTipo() { return tipo; }
     public String getValor() { return valor; }
     public int getInicio()   { return inicio; }
     public int getFim()      { return fim; }

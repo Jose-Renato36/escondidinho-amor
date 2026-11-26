@@ -7,6 +7,7 @@ import diarios.etapas.PaginaHtml;
 import diarios.etapas.Privacidade;
 import diarios.extratores.Extrator;
 import diarios.modelo.Ato;
+import diarios.modelo.Decisao;
 import diarios.modelo.Diario;
 import diarios.modelo.Fato;
 import java.util.ArrayList;
@@ -223,11 +224,12 @@ public class PaginaDiario {
         h.add("<tr><th>" + esc(rotulo) + "</th><td>" + valor + "</td></tr>");
     }
 
-    private String classeDaDecisao(String decisao) {
-        if (decisao.equals(Ato.ACEITO)) {
-            return "ok";
-        }
-        return decisao.equals(Ato.REJEITADO) ? "rej" : "duv";
+    private String classeDaDecisao(Decisao decisao) {
+        return switch (decisao) {
+            case ACEITO -> "ok";
+            case REJEITADO -> "rej";
+            case DUVIDOSO -> "duv";
+        };
     }
 
     private String recortar(String s, int max) {

@@ -17,6 +17,7 @@ import diarios.etapas.Ingestao;
 import diarios.etapas.Limpeza;
 import diarios.etapas.Portao;
 import diarios.etapas.Privacidade;
+import diarios.modelo.Decisao;
 import diarios.servidor.Formulario;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -345,11 +346,11 @@ class Testes {
         conferirMaiorQue("encontrou atos", bh.getAtos().size(), 50);
         conferirMaiorQue("descartou titulos sem corpo", bh.getTitulosDescartados(), 50);
         conferirMaiorQue("extraiu fatos", contarFatos(bh), 500);
-        conferirMaiorQue("aceitou atos", bh.contar(Ato.ACEITO), 30);
+        conferirMaiorQue("aceitou atos", bh.contar(Decisao.ACEITO), 30);
 
         boolean todosDecididos = true;
         for (Ato a : bh.getAtos()) {
-            if (a.getMotivo().isEmpty() || a.getDecisao().isEmpty()) {
+            if (a.getMotivo().isEmpty() || a.getDecisao() == null) {
                 todosDecididos = false;
             }
         }

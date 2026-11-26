@@ -1,8 +1,10 @@
 package diarios.analise;
 
+import diarios.modelo.Acao;
 import diarios.modelo.Achado;
 import diarios.modelo.Ato;
 import diarios.modelo.Contrato;
+import diarios.modelo.Decisao;
 import diarios.modelo.Diario;
 import diarios.modelo.Fato;
 import diarios.modelo.Relacao;
@@ -61,9 +63,9 @@ public class Interpretacao {
 
         int contratacoes = painel.getContratos().size();
         int atosDeContrato = contarAtosDoAssunto(diarios, Assunto.CONTRATACAO);
-        int operacoes = grafo.doTipo(Relacao.ALTERA).size()
-                + grafo.doTipo(Relacao.REVOGA).size()
-                + grafo.doTipo(Relacao.PRORROGA).size();
+        int operacoes = grafo.doTipo(Acao.ALTERA).size()
+                + grafo.doTipo(Acao.REVOGA).size()
+                + grafo.doTipo(Acao.PRORROGA).size();
         int normasAtingidas = grafo.maisAlteradas().size();
 
         StringBuilder s = new StringBuilder();
@@ -310,7 +312,7 @@ public class Interpretacao {
         ArrayList<Integer> vezes = new ArrayList<>();
         for (Diario d : diarios) {
             for (Ato a : d.getAtos()) {
-                if (!a.getDecisao().equals(Ato.DUVIDOSO)) {
+                if (a.getDecisao() != Decisao.DUVIDOSO) {
                     continue;
                 }
                 String motivo = resumirMotivo(a.getMotivo());

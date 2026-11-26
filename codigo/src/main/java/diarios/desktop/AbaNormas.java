@@ -1,6 +1,7 @@
 package diarios.desktop;
 
 import diarios.Aplicacao;
+import diarios.modelo.Acao;
 import diarios.modelo.Relacao;
 import javafx.collections.FXCollections;
 import javafx.collections.transformation.FilteredList;
@@ -30,8 +31,8 @@ public class AbaNormas implements Aba {
         this.app = app;
         tab.setClosable(false);
 
-        acao.setItems(FXCollections.observableArrayList(TODAS, Relacao.ALTERA, Relacao.REVOGA,
-                Relacao.PRORROGA, Relacao.CITA));
+        acao.setItems(FXCollections.observableArrayList(TODAS, Acao.ALTERA.name(), Acao.REVOGA.name(),
+                Acao.PRORROGA.name(), Acao.CITA.name()));
         acao.setValue(TODAS);
         acao.valueProperty().addListener((o, a, b) -> filtrar());
         HBox barra = new HBox(8, new Label("ação"), acao, contagem);
@@ -39,19 +40,11 @@ public class AbaNormas implements Aba {
         barra.setAlignment(javafx.geometry.Pos.CENTER_LEFT);
 
         tabela.getColumns().addAll(java.util.List.of(
-                coluna("Ato de origem", 380, Relacao::getOrigem),
-                coluna("Ação", 100, Relacao::getAcao),
-                coluna("Norma atingida", 260, Relacao::getAlvo)));
+                Tabelas.texto("Ato de origem", 380, Relacao::getOrigem),
+                Tabelas.<Relacao>texto("Ação", 100, r -> r.getAcao().name()),
+                Tabelas.texto("Norma atingida", 260, Relacao::getAlvo)));
         VBox.setVgrow(tabela, Priority.ALWAYS);
         tab.setContent(new VBox(barra, tabela));
-    }
-
-    private static TableColumn<Relacao, String> coluna(String nome, double largura,
-            java.util.function.Function<Relacao, String> leitor) {
-        TableColumn<Relacao, String> c = new TableColumn<>(nome);
-        c.setPrefWidth(largura);
-        c.setCellValueFactory(v -> new javafx.beans.property.SimpleStringProperty(leitor.apply(v.getValue())));
-        return c;
     }
 
     @Override
@@ -69,7 +62,7 @@ public class AbaNormas implements Aba {
     private void filtrar() {
         String escolhida = acao.getValue();
         filtradas.setPredicate(r -> escolhida == null || TODAS.equals(escolhida)
-                || escolhida.equals(r.getAcao()));
+                || escolhida.equals(r.getAcao().name()));
         contagem.setText(filtradas.size() + " relações");
     }
 }

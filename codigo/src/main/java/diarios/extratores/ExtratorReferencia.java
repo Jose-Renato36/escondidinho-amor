@@ -1,6 +1,7 @@
 package diarios.extratores;
 
 import diarios.modelo.Fato;
+import diarios.modelo.TipoFato;
 import java.util.ArrayList;
 
 public class ExtratorReferencia extends Extrator {
@@ -12,7 +13,7 @@ public class ExtratorReferencia extends Extrator {
     private static final String[] ESFERAS = {"municipal", "federal", "estadual", "conjunta"};
 
     public ExtratorReferencia() {
-        super(Fato.REFERENCIA);
+        super(TipoFato.REFERENCIA);
     }
 
     @Override

@@ -1,5 +1,6 @@
 package diarios.desktop;
 
+import diarios.modelo.Decisao;
 import diarios.persistencia.Banco;
 import java.sql.SQLException;
 import javafx.collections.FXCollections;
@@ -63,7 +64,7 @@ public class AbaGraficos implements Aba {
         for (Object[] linha : banco.atosPorDecisao()) {
             PieChart.Data fatia = new PieChart.Data(linha[0] + " (" + linha[1] + ")",
                     ((Number) linha[1]).doubleValue());
-            String cor = Estilo.corDaDecisao(String.valueOf(linha[0]));
+            String cor = Estilo.corDaDecisao(Decisao.valueOf(String.valueOf(linha[0])));
             fatia.nodeProperty().addListener((o, antigo, no) -> no.setStyle("-fx-pie-color: " + cor + ";"));
             pizza.getData().add(fatia);
         }
