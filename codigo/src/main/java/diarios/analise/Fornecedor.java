@@ -11,6 +11,7 @@ public class Fornecedor {
     private String nome;
     private double total = 0;
     private int contratos = 0;
+    private String primeiraData = "";
 
     public Fornecedor(String cnpj, String nome) {
         this.cnpj = cnpj;
@@ -21,6 +22,9 @@ public class Fornecedor {
     public void somar(Contrato c) {
         total += c.getValor();
         contratos++;
+        if (primeiraData.isEmpty() || c.getData().compareTo(primeiraData) < 0) {
+            primeiraData = c.getData();
+        }
         if (nome.equals(SEM_NOME)) {
             nome = c.getContratada();
         }
@@ -30,6 +34,9 @@ public class Fornecedor {
     public String getNome()      { return nome; }
     public double getTotal()     { return total; }
     public int getContratos()    { return contratos; }
+
+    /** Data (aaaa-mm-dd) do diario mais antigo em que a empresa aparece contratada. */
+    public String getPrimeiraData() { return primeiraData; }
 
     public String getTotalFormatado() {
         return Contrato.formatarReal(total);

@@ -3,6 +3,7 @@ package diarios.desktop;
 import diarios.Aplicacao;
 import diarios.coleta.EstadoFonte;
 import diarios.coleta.Rodada;
+import javafx.scene.Node;
 import javafx.animation.Animation;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
@@ -14,7 +15,6 @@ import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.control.ProgressBar;
 import javafx.scene.control.Spinner;
-import javafx.scene.control.Tab;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.layout.HBox;
@@ -30,7 +30,9 @@ public class AbaColeta implements Aba {
 
     private final Aplicacao app;
     private final Runnable aoTerminar;
-    private final Tab tab = new Tab("Coleta e fontes");
+    private static final String TITULO = "Coleta e fontes";
+
+    private Node conteudo;
     private final Spinner<Integer> dias = new Spinner<>(1, Aplicacao.DIAS_MAXIMO, 1);
     private final CheckBox refazer = new CheckBox("refazer todas");
     private final Button coletar = new Button("Coletar agora");
@@ -47,7 +49,6 @@ public class AbaColeta implements Aba {
     public AbaColeta(Aplicacao app, Runnable aoTerminar) {
         this.app = app;
         this.aoTerminar = aoTerminar;
-        tab.setClosable(false);
 
         dias.setEditable(true);
         dias.setPrefWidth(80);
@@ -90,10 +91,10 @@ public class AbaColeta implements Aba {
         Label tHist = new Label("Histórico de rodadas");
         tHist.getStyleClass().add("cartao-titulo");
 
-        VBox conteudo = new VBox(10, acoes, andamento, tFontes, acoesFontes, fontes, tHist, historico);
-        conteudo.setPadding(new Insets(14));
+        VBox caixa = new VBox(10, acoes, andamento, tFontes, acoesFontes, fontes, tHist, historico);
+        caixa.setPadding(new Insets(14));
         VBox.setVgrow(fontes, Priority.ALWAYS);
-        tab.setContent(conteudo);
+        conteudo = caixa;
 
         Timeline relogio = new Timeline(new KeyFrame(Duration.millis(500), e -> verificar()));
         relogio.setCycleCount(Animation.INDEFINITE);
@@ -127,8 +128,13 @@ public class AbaColeta implements Aba {
     }
 
     @Override
-    public Tab getTab() {
-        return tab;
+    public String getTitulo() {
+        return TITULO;
+    }
+
+    @Override
+    public Node getConteudo() {
+        return conteudo;
     }
 
     @Override

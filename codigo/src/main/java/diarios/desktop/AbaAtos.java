@@ -5,7 +5,9 @@ import diarios.modelo.Ato;
 import diarios.modelo.Decisao;
 import diarios.modelo.Diario;
 import diarios.modelo.Fato;
+import diarios.analise.Assunto;
 import java.util.ArrayList;
+import javafx.scene.Node;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
@@ -13,13 +15,14 @@ import javafx.collections.transformation.SortedList;
 import javafx.geometry.Insets;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.control.SplitPane;
-import javafx.scene.control.Tab;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
+import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
@@ -30,7 +33,9 @@ public class AbaAtos implements Aba {
     private static final String TODOS = "(todos)";
 
     private final Aplicacao app;
-    private final Tab tab = new Tab("Atos");
+    private static final String TITULO = "Atos";
+
+    private Node conteudo;
     private final ObservableList<Ato> todos = FXCollections.observableArrayList();
     private final FilteredList<Ato> filtrados = new FilteredList<>(todos, a -> true);
     private final TableView<Ato> tabela = new TableView<>();
@@ -38,11 +43,10 @@ public class AbaAtos implements Aba {
     private final ComboBox<String> decisao = new ComboBox<>();
     private final ComboBox<String> municipio = new ComboBox<>();
     private final Label contagem = new Label();
-    private final TextArea detalhe = new TextArea();
+    private final VBox detalhe = new VBox(12);
 
     public AbaAtos(Aplicacao app) {
         this.app = app;
-        tab.setClosable(false);
 
         busca.setPromptText("filtrar por palavra no título ou no texto");
         HBox.setHgrow(busca, Priority.ALWAYS);
@@ -63,20 +67,21 @@ public class AbaAtos implements Aba {
         tabela.setItems(ordenados);
         tabela.getSelectionModel().selectedItemProperty().addListener((o, a, b) -> mostrar(b));
 
-        detalhe.setEditable(false);
-        detalhe.setWrapText(true);
-        detalhe.setPromptText("Selecione um ato para ver o que ele faz e a prova de cada fato.");
+        detalhe.setPadding(new Insets(16));
+        ScrollPane rolagemDoDetalhe = new ScrollPane(detalhe);
+        rolagemDoDetalhe.setFitToWidth(true);
+        mostrar(null);
 
-        SplitPane divisao = new SplitPane(tabela, detalhe);
+        SplitPane divisao = new SplitPane(tabela, rolagemDoDetalhe);
         divisao.setOrientation(javafx.geometry.Orientation.VERTICAL);
-        divisao.setDividerPositions(0.55);
+        divisao.setDividerPositions(0.42);
         VBox.setVgrow(divisao, Priority.ALWAYS);
-        tab.setContent(new VBox(barra, divisao));
+        conteudo = new VBox(barra, divisao);
     }
 
     private void montarColunas() {
-        TableColumn<Ato, String> cMun = Tabelas.texto("Município", 120, Ato::getMunicipio);
-        TableColumn<Ato, String> cData = Tabelas.texto("Data", 90, Ato::getDataDiario);
+        TableColumn<Ato, String> cMun = Tabelas.texto("Município", 125, Ato::getMunicipio);
+        TableColumn<Ato, String> cData = Tabelas.texto("Data", 105, Ato::getDataDiario);
         TableColumn<Ato, String> cEsp = Tabelas.texto("Espécie", 120, Ato::getEspecie);
         TableColumn<Ato, String> cNum = Tabelas.texto("Nº", 70, Ato::getNumero);
         TableColumn<Ato, String> cDec = Tabelas.<Ato>texto("Decisão", 100, a -> a.getDecisao().name());
@@ -93,8 +98,13 @@ public class AbaAtos implements Aba {
     }
 
     @Override
-    public Tab getTab() {
-        return tab;
+    public String getTitulo() {
+        return TITULO;
+    }
+
+    @Override
+    public Node getConteudo() {
+        return conteudo;
     }
 
     @Override
@@ -129,23 +139,94 @@ public class AbaAtos implements Aba {
     }
 
     private void mostrar(Ato a) {
+        detalhe.getChildren().clear();
         if (a == null) {
-            detalhe.clear();
+            Label dica = new Label("Selecione um ato para ver o que ele faz e a prova de cada fato.");
+            dica.getStyleClass().add("sub");
+            detalhe.getChildren().add(dica);
             return;
         }
-        StringBuilder s = new StringBuilder();
-        s.append(a.getTitulo()).append("\n\n");
-        s.append("O QUE ESTE ATO FAZ\n");
-        s.append(app.leitor().ler(a, a.getDataDiario())).append("\n\n");
-        s.append("DECISÃO: ").append(a.getDecisao()).append(" — ").append(a.getMotivo()).append("\n");
-        s.append("IDENTIDADE: ").append(a.getIdentidade()).append("\n\n");
-        s.append("FATOS E A PROVA DE CADA UM\n");
-        for (Fato f : a.getFatos()) {
-            s.append("• ").append(f.getTipo()).append("  ").append(f.getValor())
-                    .append("  [").append(f.getInicio()).append("..").append(f.getFim()).append("]\n");
+        Label titulo = new Label(a.getTitulo());
+        titulo.getStyleClass().add("title-4");
+        titulo.setWrapText(true);
+
+        FlowPane chips = new FlowPane(8, 8);
+        chips.getChildren().addAll(
+                Estilo.chip(a.getDecisao().name(), tipoDoChip(a.getDecisao())),
+                Estilo.chip(a.getEspecie(), "neutro"),
+                Estilo.chip(Assunto.de(a), "neutro"));
+
+        Diario dono = donoDe(a);
+        detalhe.getChildren().addAll(titulo, chips,
+                cartao("O que este ato faz", app.leitor().ler(a, a.getDataDiario())),
+                cartao("Decisão do portão", a.getMotivo()),
+                fatos(a, dono),
+                textoDoAto(a));
+    }
+
+    private static String tipoDoChip(Decisao d) {
+        return switch (d) {
+            case ACEITO -> "ok";
+            case DUVIDOSO -> "aviso";
+            case REJEITADO -> "ruim";
+        };
+    }
+
+    private Diario donoDe(Ato a) {
+        for (Diario d : app.getDiarios()) {
+            if (d.getAtos().contains(a)) {
+                return d;
+            }
         }
-        s.append("\nTEXTO DO ATO\n").append(a.getTexto());
-        detalhe.setText(s.toString());
-        detalhe.positionCaret(0);
+        return null;
+    }
+
+    private static Node cartao(String titulo, String texto) {
+        Label t = new Label(titulo);
+        t.getStyleClass().add("cartao-titulo");
+        Label corpo = new Label(texto);
+        corpo.setWrapText(true);
+        VBox caixa = new VBox(6, t, corpo);
+        caixa.getStyleClass().add("cartao");
+        return caixa;
+    }
+
+    /** Cada fato com o trecho do diario de onde ele saiu: a prova de que nao foi inventado. */
+    private static Node fatos(Ato a, Diario dono) {
+        Label t = new Label("Fatos extraídos (" + a.getFatos().size() + ")");
+        t.getStyleClass().add("cartao-titulo");
+        VBox caixa = new VBox(8, t);
+        caixa.getStyleClass().add("cartao");
+        if (a.getFatos().isEmpty()) {
+            Label vazio = new Label("Nenhum fato extraído.");
+            vazio.getStyleClass().add("sub");
+            caixa.getChildren().add(vazio);
+        }
+        for (Fato f : a.getFatos()) {
+            Label valor = new Label(f.getValor());
+            valor.getStyleClass().add("ficha-valor");
+            HBox linha = new HBox(10, Estilo.chip(f.getTipo().name(), "neutro"), valor);
+            linha.setAlignment(javafx.geometry.Pos.CENTER_LEFT);
+            caixa.getChildren().add(linha);
+            if (dono != null) {
+                Label prova = new Label("…" + f.provar(dono.getTextoLimpo(), 60).replace('\n', ' ') + "…");
+                prova.getStyleClass().add("sub");
+                prova.setWrapText(true);
+                caixa.getChildren().add(prova);
+            }
+        }
+        return caixa;
+    }
+
+    private static Node textoDoAto(Ato a) {
+        Label t = new Label("Texto do ato");
+        t.getStyleClass().add("cartao-titulo");
+        TextArea texto = new TextArea(a.getTexto());
+        texto.setEditable(false);
+        texto.setWrapText(true);
+        texto.setPrefRowCount(10);
+        VBox caixa = new VBox(6, t, texto);
+        caixa.getStyleClass().add("cartao");
+        return caixa;
     }
 }

@@ -13,6 +13,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.Optional;
 
 /**
  * Guarda atos, contratos e relacoes entre normas num banco SQLite (um arquivo .db).
@@ -46,13 +47,15 @@ public class Banco implements AutoCloseable {
             st.executeUpdate("CREATE TABLE IF NOT EXISTS contratos ("
                     + "id INTEGER PRIMARY KEY AUTOINCREMENT, municipio TEXT, data TEXT, cnpj TEXT, "
                     + "contratada TEXT, papel TEXT, valor REAL, processo TEXT, ato TEXT)");
+            st.executeUpdate("CREATE TABLE IF NOT EXISTS empresas ("
+                    + "cnpj TEXT PRIMARY KEY, json TEXT, consultado_em TEXT)");
             st.executeUpdate("CREATE TABLE IF NOT EXISTS relacoes ("
                     + "id INTEGER PRIMARY KEY AUTOINCREMENT, origem TEXT, acao TEXT, alvo TEXT)");
         }
     }
 
     /** Troca o conteudo do banco pelo resultado do ultimo processamento, tudo numa transacao. */
-    public void salvar(ArrayList<Diario> diarios, PainelContratos painel, GrafoNormas grafo)
+    public synchronized void salvar(ArrayList<Diario> diarios, PainelContratos painel, GrafoNormas grafo)
             throws SQLException {
         conexao.setAutoCommit(false);
         try {
@@ -127,8 +130,32 @@ public class Banco implements AutoCloseable {
         }
     }
 
-    public int contar(String tabela) throws SQLException {
-        if (!tabela.equals("atos") && !tabela.equals("contratos") && !tabela.equals("relacoes")) {
+    /**
+     * Cache das consultas de CNPJ. Fica fora do salvar(): reprocessar os diarios apaga
+     * atos e contratos, mas nao deve apagar o que ja foi consultado na Receita.
+     */
+    public synchronized Optional<String> jsonDaEmpresa(String cnpj) throws SQLException {
+        try (PreparedStatement ps = conexao.prepareStatement("SELECT json FROM empresas WHERE cnpj = ?")) {
+            ps.setString(1, cnpj);
+            try (ResultSet rs = ps.executeQuery()) {
+                return rs.next() ? Optional.of(rs.getString(1)) : Optional.empty();
+            }
+        }
+    }
+
+    public synchronized void guardarEmpresa(String cnpj, String json, String quando) throws SQLException {
+        try (PreparedStatement ps = conexao.prepareStatement(
+                "INSERT OR REPLACE INTO empresas (cnpj, json, consultado_em) VALUES (?,?,?)")) {
+            ps.setString(1, cnpj);
+            ps.setString(2, json);
+            ps.setString(3, quando);
+            ps.executeUpdate();
+        }
+    }
+
+    public synchronized int contar(String tabela) throws SQLException {
+        if (!tabela.equals("atos") && !tabela.equals("contratos") && !tabela.equals("relacoes")
+                && !tabela.equals("empresas")) {
             throw new IllegalArgumentException("tabela desconhecida: " + tabela);
         }
         try (Statement st = conexao.createStatement();
@@ -138,25 +165,25 @@ public class Banco implements AutoCloseable {
     }
 
     /** Cada linha: municipio, total contratado, numero de contratos. Maior total primeiro. */
-    public ArrayList<Object[]> valorPorMunicipio() throws SQLException {
+    public synchronized ArrayList<Object[]> valorPorMunicipio() throws SQLException {
         return consultar("SELECT municipio, SUM(valor), COUNT(*) FROM contratos "
                 + "GROUP BY municipio ORDER BY SUM(valor) DESC", 3);
     }
 
     /** Cada linha: cnpj, nome, total recebido, numero de contratos. Maior total primeiro. */
-    public ArrayList<Object[]> maioresFornecedores(int limite) throws SQLException {
+    public synchronized ArrayList<Object[]> maioresFornecedores(int limite) throws SQLException {
         return consultar("SELECT cnpj, MAX(contratada), SUM(valor), COUNT(*) FROM contratos "
                 + "GROUP BY cnpj ORDER BY SUM(valor) DESC LIMIT " + Math.max(1, limite), 4);
     }
 
     /** Cada linha: decisao, quantidade. */
-    public ArrayList<Object[]> atosPorDecisao() throws SQLException {
+    public synchronized ArrayList<Object[]> atosPorDecisao() throws SQLException {
         return consultar("SELECT decisao, COUNT(*) FROM atos GROUP BY decisao "
                 + "ORDER BY COUNT(*) DESC", 2);
     }
 
     /** Cada linha: identidade, municipio, data, titulo, decisao. Procura no titulo e no texto. */
-    public ArrayList<Object[]> buscarAtos(String termo) throws SQLException {
+    public synchronized ArrayList<Object[]> buscarAtos(String termo) throws SQLException {
         String sql = "SELECT identidade, municipio, data, titulo, decisao FROM atos "
                 + "WHERE titulo LIKE ? ESCAPE '\\' OR texto LIKE ? ESCAPE '\\' "
                 + "ORDER BY data DESC, identidade LIMIT 500";
@@ -193,7 +220,7 @@ public class Banco implements AutoCloseable {
     }
 
     @Override
-    public void close() throws SQLException {
+    public synchronized void close() throws SQLException {
         conexao.close();
     }
 }

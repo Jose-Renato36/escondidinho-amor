@@ -6,12 +6,12 @@ import diarios.persistencia.ExportadorCsv;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import javafx.scene.Node;
 import javafx.collections.FXCollections;
 import javafx.geometry.Insets;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import javafx.scene.control.Tab;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
@@ -25,13 +25,14 @@ import javafx.stage.Window;
 public class AbaContratos implements Aba {
 
     private final Aplicacao app;
-    private final Tab tab = new Tab("Contratos");
+    private static final String TITULO = "Contratos";
+
+    private Node conteudo;
     private final TableView<Contrato> tabela = new TableView<>();
     private final Label total = new Label();
 
     public AbaContratos(Aplicacao app) {
         this.app = app;
-        tab.setClosable(false);
 
         Button exportar = new Button("Exportar CSV…");
         exportar.setOnAction(e -> exportar());
@@ -40,8 +41,8 @@ public class AbaContratos implements Aba {
         barra.setAlignment(javafx.geometry.Pos.CENTER_LEFT);
 
         tabela.getColumns().addAll(java.util.List.of(
-                Tabelas.texto("Município", 110, Contrato::getMunicipio),
-                Tabelas.texto("Data", 90, Contrato::getData),
+                Tabelas.texto("Município", 125, Contrato::getMunicipio),
+                Tabelas.texto("Data", 105, Contrato::getData),
                 Tabelas.texto("Contratada", 260, Contrato::getContratada),
                 Tabelas.texto("CNPJ", 140, Contrato::getCnpj),
                 Tabelas.texto("Papel", 110, Contrato::getPapel),
@@ -49,7 +50,7 @@ public class AbaContratos implements Aba {
                 Tabelas.texto("Processo", 140, Contrato::getProcesso),
                 Tabelas.texto("Ato", 240, Contrato::getIdentidadeAto)));
         VBox.setVgrow(tabela, Priority.ALWAYS);
-        tab.setContent(new VBox(barra, tabela));
+        conteudo = new VBox(barra, tabela);
     }
 
     /** Coluna numerica: ordena pelo numero, mas mostra formatado em reais. */
@@ -69,8 +70,13 @@ public class AbaContratos implements Aba {
     }
 
     @Override
-    public Tab getTab() {
-        return tab;
+    public String getTitulo() {
+        return TITULO;
+    }
+
+    @Override
+    public Node getConteudo() {
+        return conteudo;
     }
 
     @Override
@@ -85,7 +91,7 @@ public class AbaContratos implements Aba {
         escolha.setTitle("Exportar contratos");
         escolha.setInitialFileName("contratos.csv");
         escolha.getExtensionFilters().add(new FileChooser.ExtensionFilter("CSV", "*.csv"));
-        Window janela = tab.getTabPane().getScene().getWindow();
+        Window janela = conteudo.getScene().getWindow();
         File destino = escolha.showSaveDialog(janela);
         if (destino == null) {
             return;

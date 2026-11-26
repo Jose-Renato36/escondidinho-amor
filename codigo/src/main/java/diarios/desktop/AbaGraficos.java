@@ -3,6 +3,7 @@ package diarios.desktop;
 import diarios.modelo.Decisao;
 import diarios.persistencia.Banco;
 import java.sql.SQLException;
+import javafx.scene.Node;
 import javafx.collections.FXCollections;
 import javafx.geometry.Insets;
 import javafx.scene.chart.BarChart;
@@ -12,7 +13,6 @@ import javafx.scene.chart.PieChart;
 import javafx.scene.chart.XYChart;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
-import javafx.scene.control.Tab;
 import javafx.scene.layout.VBox;
 
 /** Graficos alimentados por consultas SQL no banco (GROUP BY), nao por lacos em Java. */
@@ -21,35 +21,41 @@ public class AbaGraficos implements Aba {
     private static final int FORNECEDORES_NO_GRAFICO = 8;
 
     private final Banco banco;
-    private final Tab tab = new Tab("Gráficos");
-    private final VBox conteudo = new VBox(18);
+    private static final String TITULO = "Gráficos";
+
+    private Node conteudo;
+    private final VBox caixa = new VBox(18);
     private final Label aviso = new Label();
 
     public AbaGraficos(Banco banco) {
         this.banco = banco;
-        tab.setClosable(false);
-        conteudo.setPadding(new Insets(18));
-        ScrollPane rolagem = new ScrollPane(conteudo);
+        caixa.setPadding(new Insets(18));
+        ScrollPane rolagem = new ScrollPane(caixa);
         rolagem.setFitToWidth(true);
-        tab.setContent(rolagem);
+        conteudo = rolagem;
     }
 
     @Override
-    public Tab getTab() {
-        return tab;
+    public String getTitulo() {
+        return TITULO;
+    }
+
+    @Override
+    public Node getConteudo() {
+        return conteudo;
     }
 
     @Override
     public void atualizar() {
-        conteudo.getChildren().clear();
+        caixa.getChildren().clear();
         try {
-            conteudo.getChildren().addAll(
+            caixa.getChildren().addAll(
                     titulo("Decisão do portão sobre cada ato"), graficoDeDecisoes(),
                     titulo("Valor contratado por município (R$ mil)"), graficoPorMunicipio(),
                     titulo("Maiores fornecedores (R$ mil, somados por CNPJ)"), graficoDeFornecedores());
         } catch (SQLException e) {
             aviso.setText("Não consegui consultar o banco: " + e.getMessage());
-            conteudo.getChildren().add(aviso);
+            caixa.getChildren().add(aviso);
         }
     }
 
@@ -80,6 +86,7 @@ public class AbaGraficos implements Aba {
         NumberAxis y = new NumberAxis();
         BarChart<String, Number> barras = new BarChart<>(x, y);
         barras.setLegendVisible(false);
+        barras.setCategoryGap(90);
         XYChart.Series<String, Number> serie = new XYChart.Series<>();
         for (Object[] linha : banco.valorPorMunicipio()) {
             serie.getData().add(new XYChart.Data<>(String.valueOf(linha[0]),
@@ -96,6 +103,7 @@ public class AbaGraficos implements Aba {
         CategoryAxis y = new CategoryAxis();
         BarChart<Number, String> barras = new BarChart<>(x, y);
         barras.setLegendVisible(false);
+        barras.setCategoryGap(14);
         XYChart.Series<Number, String> serie = new XYChart.Series<>();
         java.util.ArrayList<Object[]> linhas = banco.maioresFornecedores(FORNECEDORES_NO_GRAFICO);
         for (int i = linhas.size() - 1; i >= 0; i--) {

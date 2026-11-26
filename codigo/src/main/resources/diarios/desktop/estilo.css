@@ -1,0 +1,58 @@
+/* Usa as cores do tema (AtlantaFX), entao funciona igual no claro e no escuro. */
+
+.lateral {
+    -fx-background-color: -color-bg-subtle;
+    -fx-border-color: -color-border-default;
+    -fx-border-width: 0 1 0 0;
+    -fx-padding: 20 14 16 14;
+}
+.marca { -fx-font-size: 18px; -fx-font-weight: bold; }
+.nav {
+    -fx-background-color: transparent;
+    -fx-background-radius: 8;
+    -fx-alignment: CENTER_LEFT;
+    -fx-padding: 9 14;
+    -fx-cursor: hand;
+}
+.nav:hover { -fx-background-color: -color-bg-inset; }
+.nav:selected {
+    -fx-background-color: -color-accent-subtle;
+    -fx-text-fill: -color-accent-fg;
+    -fx-font-weight: bold;
+}
+
+.cabecalho {
+    -fx-padding: 16 24;
+    -fx-border-color: -color-border-default;
+    -fx-border-width: 0 0 1 0;
+}
+.pagina { -fx-background-color: -color-bg-default; }
+
+.sub { -fx-text-fill: -color-fg-muted; }
+
+.tile, .cartao {
+    -fx-background-color: -color-bg-default;
+    -fx-border-color: -color-border-default;
+    -fx-border-radius: 10;
+    -fx-background-radius: 10;
+    -fx-padding: 14 18;
+}
+.tile-numero { -fx-font-size: 26px; -fx-font-weight: bold; }
+.tile-nome { -fx-text-fill: -color-fg-muted; }
+.cartao-titulo { -fx-font-weight: bold; -fx-font-size: 14px; }
+
+.chip {
+    -fx-background-radius: 20;
+    -fx-padding: 2 11;
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+}
+.chip-ok    { -fx-background-color: -color-success-subtle; -fx-text-fill: -color-success-fg; }
+.chip-aviso { -fx-background-color: -color-warning-subtle; -fx-text-fill: -color-warning-fg; }
+.chip-ruim  { -fx-background-color: -color-danger-subtle;  -fx-text-fill: -color-danger-fg; }
+.chip-neutro{ -fx-background-color: -color-bg-inset;       -fx-text-fill: -color-fg-muted; }
+
+.ficha-rotulo { -fx-text-fill: -color-fg-muted; }
+.ficha-valor  { -fx-font-weight: bold; }
+
+.chart-bar { -fx-bar-fill: -color-accent-emphasis; }

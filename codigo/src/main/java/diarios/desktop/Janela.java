@@ -1,6 +1,12 @@
 package diarios.desktop;
 
+import atlantafx.base.controls.ToggleSwitch;
+import atlantafx.base.theme.PrimerDark;
+import atlantafx.base.theme.PrimerLight;
+import atlantafx.base.theme.Styles;
 import diarios.Aplicacao;
+import diarios.empresas.ClienteBrasilApi;
+import diarios.empresas.ServicoEmpresas;
 import diarios.persistencia.Banco;
 import diarios.servidor.Servidor;
 import java.sql.SQLException;
@@ -12,11 +18,14 @@ import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import javafx.scene.control.TabPane;
+import javafx.scene.control.ToggleButton;
+import javafx.scene.control.ToggleGroup;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
+import javafx.scene.layout.StackPane;
+import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
 /**
@@ -31,48 +40,107 @@ public class Janela extends Application {
     private final ArrayList<Aba> abas = new ArrayList<>();
     private Banco banco;
     private Servidor servidorWeb;
+
     private final Label status = new Label("lendo os diários da pasta…");
+    private final Label tituloDaPagina = new Label();
+    private final StackPane area = new StackPane();
+    private final ToggleGroup menu = new ToggleGroup();
 
     @Override
     public void start(Stage palco) {
         abrirBanco();
+        setUserAgentStylesheet(new PrimerLight().getUserAgentStylesheet());
 
         abas.add(new AbaResumo(app));
         abas.add(new AbaGraficos(banco));
         abas.add(new AbaAtos(app));
         abas.add(new AbaContratos(app));
+        abas.add(new AbaEmpresas(app, new ServicoEmpresas(banco, new ClienteBrasilApi())));
         abas.add(new AbaNormas(app));
         abas.add(new AbaColeta(app, this::reprocessarSemLer));
 
-        TabPane painel = new TabPane();
-        for (Aba a : abas) {
-            painel.getTabs().add(a.getTab());
-        }
+        BorderPane raiz = new BorderPane();
+        raiz.setLeft(montarLateral());
+        raiz.setCenter(montarPagina());
 
-        Button web = new Button("Abrir painel web");
-        web.setOnAction(e -> abrirPainelWeb());
-        Region espaco = new Region();
-        HBox.setHgrow(espaco, Priority.ALWAYS);
-        HBox topo = new HBox(8, new Label("Diários Oficiais"), espaco, web);
-        topo.setPadding(new Insets(8, 12, 8, 12));
-        topo.setAlignment(javafx.geometry.Pos.CENTER_LEFT);
-
-        status.getStyleClass().add("barra-status");
-        status.setMaxWidth(Double.MAX_VALUE);
-
-        BorderPane raiz = new BorderPane(painel);
-        raiz.setTop(topo);
-        raiz.setBottom(status);
-
-        Scene cena = new Scene(raiz, 1180, 780);
-        cena.getStylesheets().add("data:text/css;base64,"
-                + java.util.Base64.getEncoder().encodeToString(
-                        Estilo.CSS.getBytes(java.nio.charset.StandardCharsets.UTF_8)));
+        Scene cena = new Scene(raiz, 1240, 800);
+        cena.getStylesheets().add(Estilo.css());
         palco.setTitle("Diários Oficiais — análise de atos municipais");
+        palco.setMinWidth(980);
+        palco.setMinHeight(620);
         palco.setScene(cena);
         palco.show();
 
+        ((ToggleButton) menu.getToggles().get(0)).fire();
         executar("lendo e interpretando os diários da pasta…", true);
+    }
+
+    private VBox montarLateral() {
+        Label marca = new Label("Diários Oficiais");
+        marca.getStyleClass().add("marca");
+        Label sub = new Label("atos municipais, lidos por regra");
+        sub.getStyleClass().addAll("sub", Styles.TEXT_SMALL);
+
+        VBox lateral = new VBox(4, marca, sub, espaco(14));
+        lateral.getStyleClass().add("lateral");
+        lateral.setPrefWidth(230);
+        lateral.setMinWidth(230);
+
+        for (Aba aba : abas) {
+            ToggleButton item = new ToggleButton(aba.getTitulo());
+            item.getStyleClass().add("nav");
+            item.setMaxWidth(Double.MAX_VALUE);
+            item.setToggleGroup(menu);
+            item.setOnAction(e -> {
+                if (!item.isSelected()) {
+                    item.setSelected(true); // clicar no item ja marcado nao desmarca
+                }
+                mostrar(aba);
+            });
+            lateral.getChildren().add(item);
+        }
+
+        Region folga = new Region();
+        VBox.setVgrow(folga, Priority.ALWAYS);
+
+        ToggleSwitch escuro = new ToggleSwitch("Modo escuro");
+        escuro.selectedProperty().addListener((o, antes, agora) -> setUserAgentStylesheet(
+                agora ? new PrimerDark().getUserAgentStylesheet() : new PrimerLight().getUserAgentStylesheet()));
+
+        Button web = new Button("Abrir painel web");
+        web.setMaxWidth(Double.MAX_VALUE);
+        web.getStyleClass().add(Styles.BUTTON_OUTLINED);
+        web.setOnAction(e -> abrirPainelWeb());
+
+        lateral.getChildren().addAll(folga, escuro, espaco(6), web);
+        return lateral;
+    }
+
+    private BorderPane montarPagina() {
+        tituloDaPagina.getStyleClass().add(Styles.TITLE_2);
+        status.getStyleClass().add("sub");
+        Region folga = new Region();
+        HBox.setHgrow(folga, Priority.ALWAYS);
+        HBox cabecalho = new HBox(12, tituloDaPagina, folga, status);
+        cabecalho.getStyleClass().add("cabecalho");
+        cabecalho.setAlignment(javafx.geometry.Pos.CENTER_LEFT);
+
+        area.getStyleClass().add("pagina");
+        BorderPane pagina = new BorderPane(area);
+        pagina.setTop(cabecalho);
+        return pagina;
+    }
+
+    private void mostrar(Aba aba) {
+        tituloDaPagina.setText(aba.getTitulo());
+        area.getChildren().setAll(aba.getConteudo());
+    }
+
+    private static Region espaco(double altura) {
+        Region r = new Region();
+        r.setMinHeight(altura);
+        r.setPadding(new Insets(0));
+        return r;
     }
 
     private void abrirBanco() {

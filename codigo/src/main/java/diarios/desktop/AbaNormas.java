@@ -3,12 +3,12 @@ package diarios.desktop;
 import diarios.Aplicacao;
 import diarios.modelo.Acao;
 import diarios.modelo.Relacao;
+import javafx.scene.Node;
 import javafx.collections.FXCollections;
 import javafx.collections.transformation.FilteredList;
 import javafx.geometry.Insets;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
-import javafx.scene.control.Tab;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.layout.HBox;
@@ -21,7 +21,9 @@ public class AbaNormas implements Aba {
     private static final String TODAS = "(todas)";
 
     private final Aplicacao app;
-    private final Tab tab = new Tab("Normas");
+    private static final String TITULO = "Normas";
+
+    private Node conteudo;
     private final TableView<Relacao> tabela = new TableView<>();
     private final ComboBox<String> acao = new ComboBox<>();
     private final Label contagem = new Label();
@@ -29,7 +31,6 @@ public class AbaNormas implements Aba {
 
     public AbaNormas(Aplicacao app) {
         this.app = app;
-        tab.setClosable(false);
 
         acao.setItems(FXCollections.observableArrayList(TODAS, Acao.ALTERA.name(), Acao.REVOGA.name(),
                 Acao.PRORROGA.name(), Acao.CITA.name()));
@@ -44,12 +45,17 @@ public class AbaNormas implements Aba {
                 Tabelas.<Relacao>texto("Ação", 100, r -> r.getAcao().name()),
                 Tabelas.texto("Norma atingida", 260, Relacao::getAlvo)));
         VBox.setVgrow(tabela, Priority.ALWAYS);
-        tab.setContent(new VBox(barra, tabela));
+        conteudo = new VBox(barra, tabela);
     }
 
     @Override
-    public Tab getTab() {
-        return tab;
+    public String getTitulo() {
+        return TITULO;
+    }
+
+    @Override
+    public Node getConteudo() {
+        return conteudo;
     }
 
     @Override

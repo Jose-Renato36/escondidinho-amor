@@ -4,44 +4,49 @@ import diarios.Aplicacao;
 import diarios.analise.Cobertura;
 import diarios.modelo.Achado;
 import diarios.modelo.Contrato;
+import javafx.scene.Node;
 import javafx.geometry.Insets;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
-import javafx.scene.control.Tab;
-import javafx.scene.layout.FlowPane;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 
 /** Os numeros do periodo e a interpretacao em frases (as mesmas do painel web). */
 public class AbaResumo implements Aba {
 
     private final Aplicacao app;
-    private final Tab tab = new Tab("Resumo");
-    private final FlowPane tiles = new FlowPane(12, 12);
+    private static final String TITULO = "Resumo";
+
+    private Node conteudo;
+    private final HBox tiles = new HBox(12);
     private final Label resumo = new Label();
     private final VBox achados = new VBox(10);
 
     public AbaResumo(Aplicacao app) {
         this.app = app;
-        tab.setClosable(false);
 
-        Label titulo = new Label("Diários Oficiais municipais");
-        titulo.getStyleClass().add("titulo");
-        Label sub = new Label("Leitura, separação em atos e análise — tudo calculado por regra, sem IA.");
+        Label sub = new Label("Leitura, separação em atos e análise: tudo calculado por regra, sem IA.");
         sub.getStyleClass().add("sub");
 
         resumo.setWrapText(true);
         resumo.setMaxWidth(900);
 
-        VBox conteudo = new VBox(14, titulo, sub, tiles, resumo, achados);
-        conteudo.setPadding(new Insets(18));
-        ScrollPane rolagem = new ScrollPane(conteudo);
+        VBox caixa = new VBox(14, sub, tiles, resumo, achados);
+        caixa.setPadding(new Insets(18));
+        ScrollPane rolagem = new ScrollPane(caixa);
         rolagem.setFitToWidth(true);
-        tab.setContent(rolagem);
+        conteudo = rolagem;
     }
 
     @Override
-    public Tab getTab() {
-        return tab;
+    public String getTitulo() {
+        return TITULO;
+    }
+
+    @Override
+    public Node getConteudo() {
+        return conteudo;
     }
 
     @Override
@@ -59,6 +64,10 @@ public class AbaResumo implements Aba {
                 Estilo.tile(String.valueOf(app.getGrafo().getArestas().size()), "relações entre normas"),
                 Estilo.tile(c.getUtilizaveis() + " de " + c.getLidos(), "diários utilizáveis"),
                 Estilo.tile(String.valueOf(c.getRecusados()), "diário(s) recusado(s)"));
+        for (javafx.scene.Node t : tiles.getChildren()) {
+            HBox.setHgrow(t, Priority.ALWAYS);
+            ((javafx.scene.layout.Region) t).setMaxWidth(Double.MAX_VALUE);
+        }
 
         resumo.setText(app.getInterpretacao().getResumo());
 
